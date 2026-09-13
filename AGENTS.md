@@ -187,16 +187,41 @@ Given a valid run, with `Δ = new CV − baseline CV` over ≥5 seeds and `σ = 
 | Verdict | Condition | What it means | What happens next |
 |---|---|---|---|
 | **Success (+1 lead)** | `Δ > 2σ` **and** Δ > 0, and a second signal (weak-label agreement or LB rank) does not contradict it | The idea moves the metric for a reason we can name | Merge the worktree, design 2–3 follow-ups that push the same mechanism further |
-| **Confirmed on LB** | a `+1` that also improves the public score when submitted | The gain survives the distribution shift | Becomes the new baseline in experiments.md |
+| **Confirmed on LB** | a `+1` that also improves the public score when submitted | The gain survives the distribution shift | Accepted into the current baseline's lineage — promotion to *baseline* is a separate gate, see §13.1 |
 | **Neutral (−1)** | `\|Δ\| ≤ 2σ` | Indistinguishable from fold noise on 58 gold studies — **not** "slightly positive" | Stop. Record the inference. Do not re-run with a tweak unless a *new* mechanism is proposed |
 | **Failure (−1)** | `Δ < −2σ` | The idea actively hurts | Stop, and record *why* — a clean negative is worth more than a neutral |
 | **Abandoned (−1)** | fix budget exhausted (§8) before a valid run | The idea is too expensive to test at our current tooling | Stop; note what tooling would make it testable |
 | **CV/LB split** | CV says `+1`, LB says worse (or vice versa) | Information about the split, not about the idea | Do not chase the LB. Log it; it is an input to the next split experiment |
 
+### 13.1 Promotion gate — what is allowed to become "the baseline"
+
+Beating the baseline is not the same as **replacing** it. A notebook is promoted to baseline only if
+**one** of these holds:
+
+**(A) The score moves significantly — ≥ 20%.**
+Measured as **error-gap closure**, `gap = 1 − AUC`: `closure = (gap_base − gap_new) / gap_base ≥ 0.20`.
+*(At AUC 0.936 that means reaching ≈ 0.949.)* A raw 20% gain on the AUC itself is arithmetically
+impossible above 0.83, so gap closure is what "+20%" means here — log **both** numbers
+(raw Δ and closure %) so the claim is checkable. If Vaibhav intends the literal raw figure on some
+other metric, that metric and its formula are written into rules.md first.
+
+**(B) The approach is fundamentally new and needs its own baseline.**
+A different *family* — a different label source, a different input geometry, a different modality
+of supervision — that is not an increment on the current pipeline. It is promoted **as a separate
+baseline lineage**, not as a replacement: both lineages carry their own CV, their own LB, their own
+branch, and they are compared to each other, never merged into one number. Justify in one paragraph
+why it is a new family and not a tweak, and get Vaibhav's sign-off.
+
+Everything else — a real, significant, LB-confirmed `+1` that clears neither gate — is recorded as
+an **accepted improvement within the existing lineage**: merged, logged, used, but the baseline row
+in experiments.md does **not** move. This keeps the baseline a stable yardstick instead of drifting
+upward on a chain of small wins that may not compound.
+
 Rules that make the verdict honest:
 - A verdict is never revised upward after seeing the LB. The CV verdict stands as logged.
 - "Almost significant" is `-1`. There is no partial credit at n=58.
 - A `-1` is a successful *experiment* — it bought information. Only an `invalid` run is wasted.
+- The baseline only ever moves through §13.1. Every promotion names which gate it passed, A or B.
 - Every verdict is written into experiments.md the same day, with the numbers that produced it.
 
 ---

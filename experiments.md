@@ -19,6 +19,23 @@ Append-only. One row per experiment, proposed or run. Rejected proposals stay in
 **Blocking next actions:** (a) run the starter pipeline end-to-end to get *our own* CV number,
 (b) submit it once to get *our own* public score, (c) record commit hashes here.
 
+## Baseline lineages
+
+The baseline moves only through the §13.1 promotion gate: **(A)** ≥20% error-gap closure
+(`(gap_base − gap_new)/gap_base`, `gap = 1 − AUC`), or **(B)** a fundamentally new approach family,
+which gets its own lineage rather than replacing the old one. Significant `+1`s that clear neither
+gate are *accepted improvements* — merged and used, but they do not move a baseline row.
+
+| lineage | approach family | notebook / branch | CV | public LB | promoted via | date |
+|---|---|---|---|---|---|---|
+| L0 | weak-label CNN starter | `rsna-starter.ipynb` / `main` | `UNKNOWN — blocking` | `UNKNOWN — blocking` | initial | — |
+
+### Accepted improvements (inside a lineage, baseline unchanged)
+
+| exp-id | lineage | Δ CV | closure % | LB | why it did not promote |
+|---|---|---|---|---|---|
+| — | — | — | — | — | — |
+
 ## Ledger
 
 | exp-id | date | type | change | hypothesis | baseline CV | new CV | Δ CV | public LB | lead ±1 | status |

@@ -16,3 +16,4 @@ Three consecutive `struggling` lines on one experiment → stop and escalate to 
 | 2026-09-13 | claude (main) | — | Baseline CV + public LB | blocked: no local GPU/DICOM images; baseline runs on Kaggle by Vaibhav | no | Prepare Kaggle-ready 5-seed validation notebook on request |
 | 2026-09-13 | claude (main) | — | Added §3 Python-only rule, §12 action log, §13 success/failure definitions | ok | no | First experiment worktree after baseline exists |
 | 2026-09-13 | claude (main) | — | Added remote `origin` → github.com/Gandotravaibhav486/RSNA-KNEE-ABNORMALITY-DETECTION (repo reachable, currently empty — no refs) | ok | no | Hold: Vaibhav said do not push yet. Push `main` on his word |
+| 2026-09-13 | claude (main) | — | Added §13.1 promotion gate (≥20% error-gap closure or new approach family) + baseline-lineage table in experiments.md | ok | no | Flag to Vaibhav that "+20%" is read as gap closure, not raw AUC |
