@@ -105,15 +105,44 @@ Their output is a one-page proposal; disagreement among them is stated in the pr
 Each change type carries a budget. When the budget is exhausted, **stop**, write the inference,
 mark the lead `-1`, and move on. Budgets are per experiment, not per day.
 
-| Change type | Fix budget | GPU budget | Plan gate | Notes |
-|---|---|---|---|---|
-| **Data analysis** (EDA, label quality, statistics) | 3 fix attempts | 0 h — CPU only | not required | Must produce a written inference, not a plot dump. |
-| **Split** (CV design, fold assignment, leakage) | 2 fix attempts | ≤ 0.5 h | required if retraining | A split change invalidates every prior CV number — say so loudly. |
-| **Loss** (objective, weighting, label smoothing) | 3 fix attempts | ≤ 2 h | required | Must be validated on the same folds as baseline. |
-| **Architecture** (backbone, head, input geometry) | 2 fix attempts | ≤ 6 h | required | Most expensive per unit of learning; needs the strongest prior. |
-| **Training** (schedule, aug, epochs, EMA, AMP) | 4 fix attempts | ≤ 4 h | required | Cheap fixes; but 4 failed fixes = the idea is wrong, not the config. |
+**What the budgets are sized against** (from rules.md, read 2026-09-13):
+- Kaggle GPU quota is the binding constraint, not wall-clock ambition: **~30 GPU h/week**
+  **[verify on your account — this is the free-tier figure and it changes]**. Reserve ~20% (≈6 h)
+  for submission commits and reruns, leaving **≈24 GPU h/week ≈ 3.4 h/day** for experiments.
+- At the §7 cadence (≥5 experiments/day) that is **≈0.7 GPU h per experiment on average**.
+  The old "≤6 h for an architecture run" was arithmetically incompatible with that cadence.
+  Budgets below are per-experiment *ceilings*; the weekly total is what actually binds.
+- **Submission rerun is capped at 9 h with internet off.** Training runs must checkpoint so no
+  single session is load-bearing, and no experiment may produce a submission notebook that exceeds
+  the 6.75 h working limit in rules.md.
+- **The Efficiency Prize makes inference seconds a scored quantity**, so every experiment carries an
+  inference-time budget alongside its GPU budget.
+
+| Change type | Fix budget | GPU budget (per exp) | Inference-time budget | Plan gate | Notes |
+|---|---|---|---|---|---|
+| **Data analysis** (EDA, label quality, statistics) | 3 fix attempts | 0 h — CPU only | n/a | not required | Must produce a written inference, not a plot dump. Cheapest evidence we have — do these first. |
+| **Split** (CV design, fold assignment, leakage) | 2 fix attempts | ≤ 0.5 h | n/a | required if retraining | Re-score cached OOF predictions rather than retraining wherever possible. A split change invalidates every prior CV number — say so loudly. |
+| **Loss** (objective, weighting, label smoothing) | 3 fix attempts | ≤ 1.5 h | +0% | required | Same folds as baseline. Loss changes are free at inference — any inference-time cost means it is not really a loss experiment. |
+| **Architecture** (backbone, head, input geometry) | 2 fix attempts | ≤ 3 h (screening ≤ 1 h first) | ≤ +15% vs current lean lineage | required | Must pass a **screening run** — subset of studies, short schedule, ≤1 h — before any full run. A screening run that shows nothing ends the experiment at `-1` without spending the remaining budget. |
+| **Training** (schedule, aug, epochs, EMA, AMP) | 4 fix attempts | ≤ 2 h | +0% | required | Cheap fixes; but 4 failed fixes = the idea is wrong, not the config. |
+| **Packaging / efficiency** (offline weights, TTA trims, runtime profiling, submission plumbing) | 3 fix attempts | ≤ 1 h | must **reduce** time | required only if it retrains | New category, forced by the offline rerun and the Efficiency track. Every weight must ship as an attached Kaggle dataset; this is where that work is budgeted. |
 
 A "fix attempt" is one debug-and-rerun cycle after the first run fails or underperforms.
+
+**Budget discipline**
+
+- Every experiment declares its **GPU estimate before starting** and logs the **actual** in
+  experiments.md. If actual exceeds 1.5× estimate, **stop immediately** and escalate to Vaibhav —
+  an overrun is a planning failure and it is eating another experiment's quota.
+- The weekly GPU ledger lives in the experiments.md daily rollup. When the week's 24 h is spent,
+  only zero-GPU work (`data-analysis`, `paper`) continues until the quota resets.
+- **Inference seconds are logged for every experiment that touches the submission path**, whether or
+  not efficiency is the point of it. A change that adds >15% inference time must clear a `2σ` AUC
+  gain (rules.md) to be accepted at all — otherwise it is a `-1` on the efficiency track even if the
+  main metric moved.
+- With **39 days to the final deadline (2026-10-22)**, the total remaining GPU budget is roughly
+  **170 h [verify with the real quota]**. Architecture experiments at 3 h each would consume it in
+  ~56 runs; spend it on screening runs and paper experiments first.
 
 ## 9. Worktree layout and isolation
 
