@@ -110,9 +110,10 @@ A "fix attempt" is one debug-and-rerun cycle after the first run fails or underp
 ## 9. Worktree layout and isolation
 
 ```
-/Users/vaibhavgandotra/RSNA            # main, baseline + docs, no experiments run here
-/Users/vaibhavgandotra/RSNA-wt/<exp-id>/   # one worktree per experiment  (git worktree add)
+/Users/vaibhavgandotra/RSNA                      # main: baseline + docs, no experiments run here
+/Users/vaibhavgandotra/RSNA/worktrees/<exp-id>/  # one worktree per experiment (git worktree add)
 ```
+`worktrees/` is gitignored, so a worktree never shows up as untracked noise on main.
 
 Rules:
 - Branch name == worktree dir name == experiment id: `exp-YYYYMMDD-NN-<slug>`.

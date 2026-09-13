@@ -12,7 +12,9 @@ section; append to "Log".
 - `experiments.md` — ledger; **baseline CV and public LB are still UNKNOWN and are blocking.**
 - `handoff.md` — this file.
 
-**Repo state:** not yet a git repo / not yet pushed — needs Vaibhav's go-ahead on the GitHub remote.
+**Repo state:** git initialised on `main`, docs + notebooks committed (`.gitignore` excludes the
+competition CSVs, `work/`, `cache/`, `worktrees/`). Not pushed yet — waiting on the private
+GitHub repo URL from Vaibhav (`gh` is not installed on this Mac, so the repo is created by hand).
 
 **What the next session must do first (in order):**
 1. Confirm the metric, runtime limit, and external-data rules on the competition page
@@ -22,9 +24,13 @@ section; append to "Log".
 3. Submit once to get *our own* public LB number. Record it.
 4. Only then open the first experiment worktree.
 
+**Decisions made 2026-09-13:**
+- Baseline is measured by Vaibhav running the notebook on Kaggle; Claude logs the numbers here.
+- GitHub: private repo created by Vaibhav, URL pending; then `git remote add origin … && git push -u origin main`.
+- Worktrees live at `RSNA/worktrees/<exp-id>/` (gitignored).
+
 **Open questions for Vaibhav:**
-- GitHub remote (org/repo name, private?) for the baseline push.
-- Are the extra worktree directories to live at `/Users/vaibhavgandotra/RSNA-wt/`?
+- The private GitHub repo URL.
 - Kaggle CLI credentials available for automated submission, or submit manually?
 
 ## Log
