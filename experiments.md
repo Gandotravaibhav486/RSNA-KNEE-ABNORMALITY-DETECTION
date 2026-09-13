@@ -43,6 +43,13 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 | inference | **2.01 s/study** (cold cache, CPU) | 5,000 hidden studies → 2.79 h, inside the 6.75 h limit |
 | offline weights | loaded, 122 tensors, 0 missing, internet OFF | submission environment validated |
 
+**Finding — gold CV tracks the public LB closely.** The random-init run scored **0.6039 macro AUC
+on the 58 gold studies** and **0.595 on the public leaderboard** — a gap of 0.009, well inside σ.
+On this single point, gold CV looks like a roughly unbiased estimator of LB, which is better news
+than a 58-study validation set deserves. It does **not** shrink σ: the bar for calling a change
+real is still ±2σ, and one agreeing point is not a calibration curve. Re-check it at the next
+submission.
+
 **Finding — σ is the binding constraint, not the model.** At smoke scale the significance bar is
 **Δ > 0.13 AUC**. More data and more seeds will shrink it, but fold noise on 58 studies is
 irreducible: a large part of it is *which patients* are in the fold. Consequences:
@@ -63,6 +70,7 @@ irreducible: a large part of it is *which patients* are in the fold. Consequence
 | exp-id | date | type | change | hypothesis | baseline CV | new CV | Δ CV | public LB | lead ±1 | status |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `exp-20260913-01-baseline-v1` | 2026-09-13 | paper | Build the baseline notebook: fixed-epoch training, gold never fitted, stratified fold σ, dropped-cell accounting, offline-safe, runtime instrumented | Produces a defensible yardstick + the 2σ bar | — | pending | — | — | n/a | built; smoke passed, full run blocked on GPU |
+| `exp-20260913-01r-randominit` | 2026-09-13 | training | **Invalid as a baseline, kept as an ablation.** Full run whose attachments did not mount: backbone trained from **random init**, no prebuilt cache. 3 seeds x 4 epochs, all 3,406 weak studies | — | — | 0.6039 (σ 0.0537) | — | **0.595** (submitted 2026-09-13, notebook version 2) | n/a — invalid | done |
 | `exp-20260913-01s-smoke` | 2026-09-13 | training | **Smoke run on Kaggle** (120 studies, 1 seed, 4 epochs, CPU fallback — P100 unusable). **NOT a baseline.** | Prove the chain runs in the real environment | — | 0.5637 | — | — | n/a | done |
 | `exp-20260913-02-labeller-es` | 2026-09-13 | data-analysis | Weak labeller misses Spanish `condropatía` / `cartílago` / `rotuliana`; only English `chondropath`/`cartilage loss` match. Spanish is the dominant report language | PF-OA coverage is 22.9% and Lateral OA 11.9%; closing Spanish OA vocabulary should lift coverage and therefore every downstream model | 0.6879 (labeller v1) | — | — | — | — | proposed |
 | `exp-20260913-03-coverage-ceiling` | 2026-09-13 | paper | Compute the achievable ceiling: what macro AUC is reachable given current label coverage per target, assuming a perfect image model | Tells us whether to spend on labels or on models — no GPU needed | 0.6879 | — | — | — | — | proposed |
