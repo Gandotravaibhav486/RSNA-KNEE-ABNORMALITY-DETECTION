@@ -28,8 +28,23 @@ systematic direction. This run measures where that ceiling sits.
 |---|---|---|---|---|
 | 1. Smoke | `smoke` | CPU or GPU | ~15–25 min | proves the chain runs; 120 studies; no number to trust |
 | 2. Cache build | **`notebooks/cache-build-p1.ipynb`**, Kaggle CPU notebook (`Accelerator: None`) | CPU, 4 cores | ~0.6–1.5 h, **0 GPU quota** | `cache_p1/` (~3 GB) + manifest, saved as notebook output → attached as a dataset |
-| 3. Baseline | `full` (3 seeds × 4 epochs × 1200 studies) | GPU | **≈1.5 GPU h** | `baseline_v1_results.json`, the CV number and σ |
-| 4. Submit | commit + submit once | GPU | ≈0.2 GPU h | our own public LB number |
+| 3. Baseline | `full` (3 seeds × 4 epochs) | GPU (T4) | **≈0.2 GPU h** — measured, see below | `baseline_v1_results.json`, the CV number and σ |
+| 4. Submit | commit + submit once | GPU (T4) | ≈0.2 GPU h | our own public LB number |
+
+### Measured on a T4 (smoke, 2026-09-13) — the cost model was wrong
+
+`epoch 1: 75 s, epochs 2–4: 2 s each` on 120 studies. Epoch 1 carries the DICOM decode; once the
+cache is warm **an epoch costs 2 s**. The pipeline is **decode-bound, not compute-bound**:
+
+- 3,406 training studies ≈ **57 s/epoch** warm ⇒ 4 epochs × 3 seeds ≈ **12 minutes of GPU**, not 1.5 h.
+- So `MAX_TRAIN_STUDIES` should be **all 3,406**, not 1,200 — the 1,200 cap existed to fit a decode
+  budget that the cache removes.
+- Inference is also decode-bound: **1.42 s/study** ⇒ 5,000 hidden studies ≈ 2.0 h, inside the limit.
+
+**Strategic consequence for the Efficiency track:** a bigger backbone is nearly free in wall-clock,
+while more *windows or slices per study* is expensive — that is where the runtime actually goes.
+Architecture experiments should spend capacity on the model, not on reading more of the volume,
+unless the volume is demonstrably where the signal is.
 
 **Total GPU: ≈1.7 h** of the ~24 h weekly budget (AGENTS.md §8). Stage 2 deliberately runs on a
 CPU notebook so DICOM decoding does not bill GPU quota — it is the single biggest cost saving
