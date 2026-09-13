@@ -20,8 +20,9 @@ https://github.com/Gandotravaibhav486/RSNA-KNEE-ABNORMALITY-DETECTION (reachable
 `main` **pushed** 2026-09-13 (5 commits, upstream tracking set).
 
 **What the next session must do first (in order):**
-1. Confirm the metric, runtime limit, and external-data rules on the competition page
-   (everything marked **[verify]** in rules.md).
+1. ~~Confirm metric / runtime / external-data rules~~ — **done 2026-09-13**, folded into rules.md.
+   Still open: the exact Efficiency-Prize formula, the hidden test size, the daily submission cap.
+   **Vaibhav must accept the competition rules on Kaggle before 2026-10-15** or none of this counts.
 2. Run `rsna-starter.ipynb` end-to-end to produce *our own* CV number on the 58 gold studies,
    with repeated K-fold over ≥5 seeds. Record it in experiments.md with the commit hash.
 3. Submit once to get *our own* public LB number. Record it.

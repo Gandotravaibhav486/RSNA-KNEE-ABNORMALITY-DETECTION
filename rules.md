@@ -1,8 +1,8 @@
 # rules.md — RSNA Knee MRI Abnormality Detection (competition-specific)
 
 Every code change is checked against this file before acceptance (AGENTS.md §2).
-Facts marked **[verify]** were inferred from the local data/notebooks and must be confirmed
-against the official competition page before they are relied on.
+Competition facts below are taken from the official Overview / Evaluation / Code Requirements
+pages (read 2026-09-13). Items still marked **[verify]** could not be confirmed from those pages.
 
 ## Competition facts
 
@@ -13,8 +13,54 @@ against the official competition page before they are relied on.
   free-text `Report` (multilingual — Spanish-dominant) and no labels.
 - **Series metadata:** `train_series.csv` / `test_series.csv` give `Fluid_Sensitive`,
   `Fat_Suppression`, `Anatomical_Plane` per series. Studies have a variable bag of series.
-- **Metric:** macro / column-wise ROC AUC **[verify]**.
+- **Metric:** **macro-averaged ROC AUC** across the twelve targets. Confirmed on the Evaluation page.
 - **Submission:** notebook rerun against a hidden test set; the visible `test.csv` has 3 studies.
+  The output file **must be named `submission.csv`**.
+
+## Code requirements (from the Code Requirements page — hard, enforced by Kaggle)
+
+- **≤ 9 hours run-time**, CPU or GPU notebook. Both limits are 9 h.
+- **Internet access disabled** in the rerun. Every weight, package, and asset must arrive as an
+  attached Kaggle dataset/model. No `pip install` from PyPI, no `torch.hub`, no HF download at runtime.
+- **Freely and publicly available external data is allowed, including pre-trained models.**
+  DINOv2/DINOv3/RadImageNet/CoAtNet-style backbones are therefore permitted — provided the weights
+  are public and free. Record the dataset/model URL and its licence in the experiment entry.
+- Submission file name: `submission.csv`.
+
+## Timeline (all 23:59 UTC)
+
+| Date | Event | Days from 2026-09-13 |
+|---|---|---|
+| 2026-07-30 | Start | — |
+| **2026-10-15** | **Entry deadline — competition rules must be accepted before this date** | **32** |
+| 2026-10-15 | Team merger deadline | 32 |
+| **2026-10-22** | **Final submission deadline** | **39** |
+| 2026-11-05 | Winners' requirement deadline (code, weights, video) | 53 |
+
+At the daily cadence in AGENTS.md §7 (≥5 runs/day) that is roughly **195 experiment slots** left.
+Plan the experiment budget against that number, not against an open-ended horizon.
+
+## Efficiency track (a second, separately-prized objective)
+
+- A second prize track ranks submissions by an **efficiency score combining private-LB AUC and
+  evaluation runtime in seconds** — lower is better. Exact formula: see the Evaluation page
+  (the rendered formula did not transfer here) **[verify — copy it verbatim before optimising for it]**.
+- Eligibility: the submission must be one the team **selected for the main leaderboard**, and must
+  beat the `sample_submission.csv` benchmark on the private LB.
+- **Consequence for our pipeline:** runtime is not just a constraint, it is a prize. Every experiment
+  logs wall-clock inference seconds alongside its AUC. A change that adds an ensemble branch for
+  +0.002 AUC and +40 minutes is a *negative* on the efficiency track — record both effects.
+- Because one submission can win both tracks, keep at least one **lean** lineage alive
+  (single model, minimal TTA) rather than only chasing the heavy ensemble.
+
+## Winners' obligations (constrain what we are allowed to build)
+
+Winners must open-source the training code, publish a link to the code **and the weights** on the
+forum, share the final model publicly for open distribution and validation, and produce a short video.
+
+- **Therefore: no weight, dataset, or backbone whose licence forbids redistribution.**
+  Check the licence *before* an experiment depends on it — a non-redistributable backbone makes a
+  winning solution unclaimable. This is a rules.md hard rule, not a nicety.
 
 ## Hard rules (violation = automatic reject)
 
@@ -34,10 +80,15 @@ against the official competition page before they are relied on.
    the same CV number, or the difference is reported as run-to-run noise.
 6. **No leakage across studies within a split** — split at `StudyInstanceUID` level, never at
    series or slice level.
-7. **Runtime budget:** inference must fit the competition's notebook time limit **[verify]** with
-   ≥25% headroom, measured on the visible test path scaled to the expected hidden test size.
-8. **No external data or pretrained weights that the competition disallows** **[verify]** — check the
-   rules page before adding any Kaggle dataset dependency, and record the dataset URL in the experiment.
+7. **Runtime budget:** inference must complete in **≤ 6.75 h** — the 9 h Kaggle limit with 25%
+   headroom — measured on the visible test path extrapolated to the expected hidden test size
+   **[verify: hidden test size is not published; extrapolate per-study seconds and state the
+   assumed study count]**. A notebook that cannot state its per-study seconds is not reviewable.
+8. **Offline by construction:** no network call anywhere in the notebook. All weights and packages
+   come from attached Kaggle datasets/models. A notebook that only works with internet on is invalid.
+9. **Redistributable licences only** — see *Winners' obligations*. Record every external
+   dataset/model URL **and its licence** in the experiment entry.
+10. **Output file is `submission.csv`**, written unconditionally, including on the failure path.
 
 ## Statistical rules (how we decide +1 / -1)
 
@@ -46,11 +97,21 @@ against the official competition page before they are relied on.
   - repeated CV (≥5 seeds) on the gold set, and
   - a paired comparison (same folds, same seeds) against the baseline, and
   - `delta > 2 × std(delta across seeds)`.
+- **Degenerate folds.** Some targets have as few as 9 positives among the 58 gold studies, so a
+  plain K-fold will produce folds where a label has **zero positives and its AUC is undefined**.
+  Default rule (mine — override if you prefer another): use **stratified repeated K-fold with K=5,
+  stratified per-label on the rarest positive count**, and when a label's AUC is still undefined in a
+  fold, **drop that (fold, label) cell and average over the cells that exist** — never impute 0.5,
+  never drop the whole fold. Report the number of dropped cells with every CV number; a change in
+  that count makes two CV numbers incomparable.
 - Any delta smaller than that is reported as **noise → -1**, no matter how good it looks.
 - Because gold is tiny, a **second validation signal is mandatory** for architecture/loss changes:
   agreement with weak labels on held-out reported studies, or rank correlation with the public LB.
 - **Public LB is a 1-bit-per-submission oracle.** Never tune on it. Treat LB/CV disagreement as
   information about the split, and record it.
+- **Submission budget:** daily cap **[verify on the competition's Submissions tab]**; final
+  submissions are chosen by **CV, not by public LB**, and at least one of them should be the lean
+  lineage that is eligible for the Efficiency Prize (see above).
 
 ## Label rules
 
