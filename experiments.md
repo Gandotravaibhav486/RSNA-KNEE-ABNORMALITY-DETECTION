@@ -9,17 +9,20 @@ Append-only. One row per experiment, proposed or run. Rejected proposals stay in
 | Field | Value |
 |---|---|
 | Metric | macro ROC AUC over 12 targets *(verify against competition page)* |
-| CV protocol | repeated K-fold over the 58 gold studies, seeds `[0,1,2,3,4]` — **not yet run** |
-| Baseline CV score | `UNKNOWN — blocking` |
-| Baseline public LB | `UNKNOWN — blocking` (rsna-baseline.ipynb's provenance note claims **0.936** for the copied public ensemble; that number is *reported, not measured by us*) |
-| Baseline commit | `UNKNOWN — blocking` |
+| CV protocol | 3 training seeds `[2026,2027,2028]`; evaluation = 5 folds × 5 repeats over the 58 gold studies; σ from the 900 (seed,repeat,fold) cells |
+| Baseline CV score | **0.6339** macro AUC on the 58 gold studies (mean of 3 seeds; 3-seed ensemble 0.6442) |
+| Baseline public LB | submitted 2026-09-13 19:39 UTC, **pending** (notebook `rsna-knee-baseline-v1-full` v4). The 0.936 in the history is the copied public ensemble, not our pipeline. |
+| Baseline commit | `notebooks/baseline-v1.ipynb` @ this commit; Kaggle notebook version 4; cache `p1`; labeller `v1-keyword` |
 | Baseline notebook | **`notebooks/baseline-v1.ipynb`** (built 2026-09-13, all in-notebook tests pass, not yet run on GPU) |
 | Weak labeller `v1-keyword` | **macro AUC 0.6879 on the 58 gold studies** — measured 2026-09-13, CPU only. This is the floor the image model must beat. |
-| Date measured | — |
+| Date measured | 2026-09-13 (Kaggle, Tesla T4, 0.36 GPU h) |
 
-**Blocking next actions:** (a) approve [plans/baseline-v1.md](plans/baseline-v1.md), (b) run
-`notebooks/baseline-v1.ipynb` stages 1–3 on Kaggle for *our own* CV number and σ, (c) submit once
-for *our own* public score, (d) record commit hashes here.
+**Baseline is measured.** The significance bar for every later experiment is **Δ > 0.1110 (2σ)**
+on gold CV, computed from the 900 evaluation cells of this run.
+
+**The headline problem:** the image model scores **0.6339**, the weak labeller alone scores
+**0.6879**. The model is *worse than the text rules it was trained on*. It cannot exceed its label
+ceiling, and right now it does not even reach it. This sets the experiment priority: labels first.
 
 ## Baseline lineages
 
@@ -30,7 +33,7 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 
 | lineage | approach family | notebook / branch | CV | public LB | promoted via | date |
 |---|---|---|---|---|---|---|
-| L0 | weak-label CNN starter | `rsna-starter.ipynb` / `main` | `UNKNOWN — blocking` | `UNKNOWN — blocking` | initial | — |
+| L0 | weak-label CNN (resnet18 + per-target attention over 12 windows) | `notebooks/baseline-v1.ipynb` / `main` | **0.6339** ± σ 0.0555 | pending | initial | 2026-09-13 |
 
 ### Measured facts from the smoke run (2026-09-13, Kaggle, CPU fallback)
 
@@ -74,6 +77,8 @@ irreducible: a large part of it is *which patients* are in the fold. Consequence
 | `exp-20260913-01s-smoke` | 2026-09-13 | training | **Smoke run on Kaggle** (120 studies, 1 seed, 4 epochs, CPU fallback — P100 unusable). **NOT a baseline.** | Prove the chain runs in the real environment | — | 0.5637 | — | — | n/a | done |
 | `exp-20260913-02-labeller-es` | 2026-09-13 | data-analysis | Weak labeller misses Spanish `condropatía` / `cartílago` / `rotuliana`; only English `chondropath`/`cartilage loss` match. Spanish is the dominant report language | PF-OA coverage is 22.9% and Lateral OA 11.9%; closing Spanish OA vocabulary should lift coverage and therefore every downstream model | 0.6879 (labeller v1) | — | — | — | — | proposed |
 | `exp-20260913-03-coverage-ceiling` | 2026-09-13 | paper | Compute the achievable ceiling: what macro AUC is reachable given current label coverage per target, assuming a perfect image model | Tells us whether to spend on labels or on models — no GPU needed | 0.6879 | — | — | — | — | proposed |
+| `exp-20260914-05-pretrain-ablation` | 2026-09-14 | paper | Paired comparison of the two runs we already have: pretrained (0.6339) vs random init (0.6039), using the saved `gold_probs_seed*.npy` — no GPU | Δ=+0.030 is only 0.27σ, so ImageNet pretraining is **not** provably worth anything here by our own bar. Paired cells will say it far more tightly than the marginal σ does | 0.6339 | — | — | — | — | proposed |
+| `exp-20260914-06-inference-timing` | 2026-09-14 | packaging | Re-measure inference seconds with the test studies **excluded from the cache** | The 0.08 s/study this run reported is an artefact — the cache build included test UIDs, so "inference" read prebuilt tensors. The hidden test set will never be cached | — | — | — | — | — | proposed |
 | `exp-20260913-04-screening-metric` | 2026-09-13 | split | Use agreement with weak labels on ~3,400 held-out reported studies as the *screening* metric, gold as confirmation | 2σ on gold is ~0.13 AUC — most experiments are unprovable there; a 3,400-study signal has far tighter error bars even though its labels are noisier | 0.6879 | — | — | — | — | proposed |
 
 `type` ∈ `data-analysis` \| `split` \| `loss` \| `architecture` \| `training` \| `paper`
