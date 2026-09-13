@@ -32,6 +32,26 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 |---|---|---|---|---|---|---|
 | L0 | weak-label CNN starter | `rsna-starter.ipynb` / `main` | `UNKNOWN — blocking` | `UNKNOWN — blocking` | initial | — |
 
+### Measured facts from the smoke run (2026-09-13, Kaggle, CPU fallback)
+
+| quantity | value | note |
+|---|---|---|
+| smoke macro AUC (120 studies, 1 seed) | **0.5637** | below the labeller's 0.6879 — expected at 1/30th of the training data; **not** a baseline |
+| fold σ | **0.0657** → **2σ = 0.1314** | see the finding below |
+| undefined (fold,label) cells dropped | **0 / 300** | the greedy stratifier balanced even 9-positive targets; the degenerate-cell risk did not materialise at 5 folds |
+| training, cold decode | 123 s for epoch 1 vs ~85 s after | ⇒ DICOM decode ≈ **0.32 s/study** with 2 workers |
+| inference | **2.01 s/study** (cold cache, CPU) | 5,000 hidden studies → 2.79 h, inside the 6.75 h limit |
+| offline weights | loaded, 122 tensors, 0 missing, internet OFF | submission environment validated |
+
+**Finding — σ is the binding constraint, not the model.** At smoke scale the significance bar is
+**Δ > 0.13 AUC**. More data and more seeds will shrink it, but fold noise on 58 studies is
+irreducible: a large part of it is *which patients* are in the fold. Consequences:
+1. Small gains are **unprovable on gold alone**. The mandatory second signal in rules.md is not
+   bureaucracy — it is the only way most experiments can be judged.
+2. Prefer experiments with large expected effects (labels, input geometry) over tuning.
+3. Consider adding weak-label agreement on held-out reported studies (n≈3,400) as the primary
+   screening metric, with gold as the confirmation. **Proposed as `exp-20260913-04`.**
+
 ### Accepted improvements (inside a lineage, baseline unchanged)
 
 | exp-id | lineage | Δ CV | closure % | LB | why it did not promote |
@@ -42,9 +62,11 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 
 | exp-id | date | type | change | hypothesis | baseline CV | new CV | Δ CV | public LB | lead ±1 | status |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `exp-20260913-01-baseline-v1` | 2026-09-13 | paper | Build the baseline notebook: fixed-epoch training, gold never fitted, stratified fold σ, dropped-cell accounting, offline-safe, runtime instrumented | Produces a defensible yardstick + the 2σ bar | — | pending | — | — | n/a | approved-pending-run |
+| `exp-20260913-01-baseline-v1` | 2026-09-13 | paper | Build the baseline notebook: fixed-epoch training, gold never fitted, stratified fold σ, dropped-cell accounting, offline-safe, runtime instrumented | Produces a defensible yardstick + the 2σ bar | — | pending | — | — | n/a | built; smoke passed, full run blocked on GPU |
+| `exp-20260913-01s-smoke` | 2026-09-13 | training | **Smoke run on Kaggle** (120 studies, 1 seed, 4 epochs, CPU fallback — P100 unusable). **NOT a baseline.** | Prove the chain runs in the real environment | — | 0.5637 | — | — | n/a | done |
 | `exp-20260913-02-labeller-es` | 2026-09-13 | data-analysis | Weak labeller misses Spanish `condropatía` / `cartílago` / `rotuliana`; only English `chondropath`/`cartilage loss` match. Spanish is the dominant report language | PF-OA coverage is 22.9% and Lateral OA 11.9%; closing Spanish OA vocabulary should lift coverage and therefore every downstream model | 0.6879 (labeller v1) | — | — | — | — | proposed |
 | `exp-20260913-03-coverage-ceiling` | 2026-09-13 | paper | Compute the achievable ceiling: what macro AUC is reachable given current label coverage per target, assuming a perfect image model | Tells us whether to spend on labels or on models — no GPU needed | 0.6879 | — | — | — | — | proposed |
+| `exp-20260913-04-screening-metric` | 2026-09-13 | split | Use agreement with weak labels on ~3,400 held-out reported studies as the *screening* metric, gold as confirmation | 2σ on gold is ~0.13 AUC — most experiments are unprovable there; a 3,400-study signal has far tighter error bars even though its labels are noisier | 0.6879 | — | — | — | — | proposed |
 
 `type` ∈ `data-analysis` \| `split` \| `loss` \| `architecture` \| `training` \| `paper`
 (`paper` = inferred without GPU spend).
