@@ -15,8 +15,9 @@ section; append to "Log".
 - `handoff.md` — this file.
 
 **Repo state:** git initialised on `main`, docs + notebooks committed (`.gitignore` excludes the
-competition CSVs, `work/`, `cache/`, `worktrees/`). Not pushed yet — waiting on the private
-GitHub repo URL from Vaibhav (`gh` is not installed on this Mac, so the repo is created by hand).
+competition CSVs, `work/`, `cache/`, `worktrees/`). Remote `origin` points at
+https://github.com/Gandotravaibhav486/RSNA-KNEE-ABNORMALITY-DETECTION (reachable, empty).
+**Nothing pushed — Vaibhav asked to hold.** When he gives the word: `git push -u origin main`.
 
 **What the next session must do first (in order):**
 1. Confirm the metric, runtime limit, and external-data rules on the competition page
@@ -28,11 +29,11 @@ GitHub repo URL from Vaibhav (`gh` is not installed on this Mac, so the repo is 
 
 **Decisions made 2026-09-13:**
 - Baseline is measured by Vaibhav running the notebook on Kaggle; Claude logs the numbers here.
-- GitHub: private repo created by Vaibhav, URL pending; then `git remote add origin … && git push -u origin main`.
+- GitHub: repo is `Gandotravaibhav486/RSNA-KNEE-ABNORMALITY-DETECTION`; remote wired, push held back on request.
 - Worktrees live at `RSNA/worktrees/<exp-id>/` (gitignored).
 
 **Open questions for Vaibhav:**
-- The private GitHub repo URL.
+- When to push `main` to origin (3 commits waiting).
 - Kaggle CLI credentials available for automated submission, or submit manually?
 
 ## Log
