@@ -62,6 +62,13 @@ irreducible: a large part of it is *which patients* are in the fold. Consequence
 3. Consider adding weak-label agreement on held-out reported studies (n≈3,400) as the primary
    screening metric, with gold as the confirmation. **Proposed as `exp-20260913-04`.**
 
+**Community benchmark (from [discussion findings](experiments/discussion-findings-20260914.md), 2026-09-14).**
+Measured by other competitors against the same 58 gold studies: their regex labeller scores
+**0.8136**, their LLM labeller **0.8780**, ours **0.6879**. Our label stage is ~0.13 behind the
+field's *non-LLM* baseline. Public LLM label sets exist and external public data is allowed.
+Separately, they measure encoder scaling (DINOv2-S→B) at +0.0011 against a 0.0020 noise floor —
+capacity is not the constraint; a crop-geometry fix paid +0.0059 and moved 10/12 labels.
+
 ### Accepted improvements (inside a lineage, baseline unchanged)
 
 | exp-id | lineage | Δ CV | closure % | LB | why it did not promote |
