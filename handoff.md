@@ -7,9 +7,11 @@ section; append to "Log".
 
 **Set up today:** governance docs only — no pipeline change, no GPU spend.
 
-- `AGENTS.md` — permanent rules (plan-gate on GPU, review chain, worktrees, fix budgets, cadence).
+- `AGENTS.md` — permanent rules (plan-gate on GPU, Python-only notebooks, review chain, worktrees,
+  fix budgets, cadence, action log, success/failure definitions).
 - `rules.md` — RSNA knee-MRI specific hard rules + the statistical test for +1/-1.
 - `experiments.md` — ledger; **baseline CV and public LB are still UNKNOWN and are blocking.**
+- `agent-log.md` — append-only action log; the `struggling?` column is where agents must be honest.
 - `handoff.md` — this file.
 
 **Repo state:** git initialised on `main`, docs + notebooks committed (`.gitignore` excludes the
