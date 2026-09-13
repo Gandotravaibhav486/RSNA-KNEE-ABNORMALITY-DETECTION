@@ -17,7 +17,7 @@ section; append to "Log".
 **Repo state:** git initialised on `main`, docs + notebooks committed (`.gitignore` excludes the
 competition CSVs, `work/`, `cache/`, `worktrees/`). Remote `origin` points at
 https://github.com/Gandotravaibhav486/RSNA-KNEE-ABNORMALITY-DETECTION (reachable, empty).
-**Nothing pushed — Vaibhav asked to hold.** When he gives the word: `git push -u origin main`.
+`main` **pushed** 2026-09-13 (5 commits, upstream tracking set).
 
 **What the next session must do first (in order):**
 1. Confirm the metric, runtime limit, and external-data rules on the competition page
@@ -33,7 +33,7 @@ https://github.com/Gandotravaibhav486/RSNA-KNEE-ABNORMALITY-DETECTION (reachable
 - Worktrees live at `RSNA/worktrees/<exp-id>/` (gitignored).
 
 **Open questions for Vaibhav:**
-- When to push `main` to origin (3 commits waiting).
+- Should `.claude/`, `.agents/`, `skills-lock.json` be tracked too? (currently untracked)
 - Kaggle CLI credentials available for automated submission, or submit manually?
 
 ## Log
