@@ -27,13 +27,35 @@ systematic direction. This run measures where that ceiling sits.
 | Stage | `RUN_MODE` | Hardware | Est. cost | Output |
 |---|---|---|---|---|
 | 1. Smoke | `smoke` | CPU or GPU | ~15–25 min | proves the chain runs; 120 studies; no number to trust |
-| 2. Cache build | `smoke` with `MAX_TRAIN_STUDIES` raised, **CPU-only notebook** | CPU | 2–5 h CPU, **0 GPU quota** | `cache_p1/` (~3 GB) saved as a Kaggle dataset |
+| 2. Cache build | **`notebooks/cache-build-p1.ipynb`**, Kaggle CPU notebook (`Accelerator: None`) | CPU, 4 cores | ~0.6–1.5 h, **0 GPU quota** | `cache_p1/` (~3 GB) + manifest, saved as notebook output → attached as a dataset |
 | 3. Baseline | `full` (3 seeds × 4 epochs × 1200 studies) | GPU | **≈1.5 GPU h** | `baseline_v1_results.json`, the CV number and σ |
 | 4. Submit | commit + submit once | GPU | ≈0.2 GPU h | our own public LB number |
 
 **Total GPU: ≈1.7 h** of the ~24 h weekly budget (AGENTS.md §8). Stage 2 deliberately runs on a
 CPU notebook so DICOM decoding does not bill GPU quota — it is the single biggest cost saving
 available and it makes every later experiment cheaper, since the cache is reused.
+
+### Stage 2 in detail — it cannot run locally
+
+This machine holds only the four CSVs; **the DICOM series exist only on Kaggle**, so the cache must
+be built there. `notebooks/cache-build-p1.ipynb` does it:
+
+1. Open it on Kaggle, attach the competition data, set **Accelerator: None**.
+2. Run. It decodes with `ProcessPoolExecutor` across all available cores (~4 on a Kaggle CPU
+   notebook), skips studies already cached, and **stops cleanly at `TIME_LIMIT_H = 8`** keeping
+   everything built so far — re-running resumes.
+3. **Save Version** (persists `/kaggle/working`, up to 20 GB **[verify]**).
+4. In `baseline-v1.ipynb`, add that notebook's output as a data source and point
+   `CACHE_INPUT_DIRS` at it. Training then never decodes a training DICOM again.
+
+If one session cannot finish, raise `N_CHUNKS` and run it once per `CHUNK_INDEX`; attach every
+chunk. The manifest records the study count, mean seconds per study, zero-valid-window studies,
+errors, and a fingerprint of the preprocessing code — a cache built by different code than the
+code that reads it is worse than no cache.
+
+**Note on scope:** the cache speeds up *training and experiments only*. The submission notebook
+still decodes the hidden test studies live, which is why per-study inference seconds are measured
+separately in stage 4.
 
 ## Expected delta
 
