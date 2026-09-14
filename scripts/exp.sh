@@ -62,6 +62,11 @@ cmd_push() {
   "version_notes": "$id"
 }
 JSON
+  # Static check first: our local harness skips every `if HAVE_IMAGES:` branch, so a missing name
+  # inside one is invisible until it costs a Kaggle run. exp-10 v1 died on `preflight` that way.
+  if ! "${PY:-/Applications/anaconda3/bin/python3}" "$REPO/scripts/lint_nb.py" "$nb"; then
+    echo "lint failed — not pushing" >&2; return 1
+  fi
   local out
   out=$( (cd "$dir" && "$KAGGLE" kernels push -p . "${accel[@]}") 2>&1 | tail -1 )
   echo "$out"
