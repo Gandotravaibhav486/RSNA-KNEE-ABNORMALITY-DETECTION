@@ -72,7 +72,7 @@ JSON
     echo "lint failed — not pushing" >&2; return 1
   fi
   local out
-  out=$( (cd "$dir" && "$KAGGLE" kernels push -p . "${accel[@]}") 2>&1 | tail -1 )
+  out=$( (cd "$dir" && "$KAGGLE" kernels push -p . ${accel[@]+"${accel[@]}"}) 2>&1 | tail -1 )
   echo "$out"
   case "$out" in
     *"error"*|*"Maximum batch"*)
