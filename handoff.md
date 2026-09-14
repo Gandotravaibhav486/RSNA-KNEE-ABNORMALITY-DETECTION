@@ -5,13 +5,15 @@ append to "Log".
 
 ## Current state — 2026-09-14
 
-**Baseline exists, is submitted, and has scored. The blocking item is gone.**
+**Lineage L1 is the baseline: gold CV 0.7642, public LB 0.803.** One label change did it.
 
 | | value |
 |---|---|
-| Lineage **L0** gold CV | **0.6339** (3 seeds; 3-seed ensemble 0.6442) |
-| σ / significance bar | 0.0555 → **Δ > 0.1110 (2σ)** |
-| **Public LB** | **0.641** (submission 56213958, notebook `rsna-knee-baseline-v1-full` v4) |
+| **Lineage L1 gold CV** | **0.7642** (3 seeds; ensemble 0.7760) — public LLM label key |
+| **L1 public LB** | **0.803** (submission 56235067) |
+| Lineage L0 (regex labels) | CV 0.6339, LB 0.641 |
+| Primary instrument | **screening metric v2: 2σ = 0.0068** (exp-04), 16× tighter than gold |
+| Gold σ / bar | 0.0555 → Δ > 0.1110 (2σ) — confirmation set only now |
 | Random-init ablation | CV 0.6039 → LB 0.595 |
 | Weak labeller `v1-keyword` alone | 0.6879 on gold |
 | GPU spent | 0.36 h valid run + 1.26 h on the invalid one |

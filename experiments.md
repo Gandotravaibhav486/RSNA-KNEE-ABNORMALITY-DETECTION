@@ -49,7 +49,7 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 | lineage | approach family | notebook / branch | CV | public LB | promoted via | date |
 |---|---|---|---|---|---|---|
 | L0 | weak-label CNN, **regex labels** (resnet18 + per-target attention, 12 windows) | `notebooks/baseline-v1.ipynb` / `main` | 0.6339 ± σ 0.0555 | 0.641 | initial | 2026-09-13 |
-| **L1** | same model, **public LLM label key** `llm_labels_v4_blend` | `notebooks/exp-08-llm-labels.ipynb` | **0.7642** ± σ 0.0459 (ensemble 0.7760) | not yet submitted | **gate A: 35.6% error-gap closure** | 2026-09-14 |
+| **L1** | same model, **public LLM label key** `llm_labels_v4_blend` | `notebooks/exp-08-llm-labels.ipynb` | **0.7642** ± σ 0.0459 (ensemble 0.7760) | **0.803** | **gate A: 35.6% CV closure, 45.1% on LB; confirmed on LB** | 2026-09-14 |
 
 ### Measured facts from the smoke run (2026-09-13, Kaggle, CPU fallback)
 
@@ -67,11 +67,17 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 | run | gold CV | public LB | gap |
 |---|---|---|---|
 | random-init ablation | 0.6039 | 0.595 | −0.009 |
-| baseline L0 (pretrained + cache) | 0.6339 | **0.641** | +0.007 |
+| baseline L0 (pretrained + cache) | 0.6339 | 0.641 | +0.007 |
+| **L1 (LLM labels)** | 0.7642 | **0.803** | **+0.039** |
 
-Both gaps are well inside σ, and the LB ordering matches the CV ordering. Gold CV is not lying to us
-about direction. It does **not** shrink σ — the ±2σ bar still stands — and two points are not a
-calibration curve.
+The ordering holds — three for three — but **the offset is not constant**, and the third point breaks
+the ±0.01 band the first two suggested. Do not use "LB ≈ CV" as a predictor. A plausible reason: the
+58 gold studies are the annotator's sampling, not the disease distribution (every gold study has at
+least one positive, mean 4.14 findings per study), so gold is a harder and differently-balanced set
+than the hidden test. Under that reading, CV *understates* LB and understates it more as the model
+gets better — which would mean our 2σ gold bar is even more conservative than it looks.
+
+Treat CV as a direction indicator, not a level predictor. Levels come from the LB, one per day.
 
 Note what the pair also says about pretraining: **+0.030 on CV, +0.046 on the LB**, and the LB is
 scored on far more studies than 58. By our own 2σ rule the CV gain is "unprovable", yet the larger
