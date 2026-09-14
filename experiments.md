@@ -27,8 +27,13 @@ agreement with weak labels and is for **ranking variants**, never for quoting a 
 | instrument | n | 2σ bar | cost |
 |---|---|---|---|
 | 58 gold studies | 58 | 0.1110 | free (rides along) |
-| screening metric | 3,406 | **0.0182** | 0.22 GPU h per arm (3 folds) |
+| screening metric, regex key (v1) | 3,406 | 0.0182 | 0.22 GPU h per arm |
+| **screening metric, L1 key (v2)** | 3,406 | **0.0068** | 0.22 GPU h per arm |
 | public LB | hidden | ~unknown | 1 submission/day |
+
+The v2 instrument is **16× tighter than gold**. The L1 key decides 40,850 cells against the regex
+key's ~14,000, and decides them better — a sharper ruler as well as a longer one. Same known-answer
+test passes: pretrained 0.7419 vs random init 0.6642, Δ +0.0777, CI [+0.0708, +0.0834].
 
 **The headline problem:** the image model scores **0.6339**, the weak labeller alone scores
 **0.6879**. The model is *worse than the text rules it was trained on*. It cannot exceed its label
@@ -72,6 +77,13 @@ Note what the pair also says about pretraining: **+0.030 on CV, +0.046 on the LB
 scored on far more studies than 58. By our own 2σ rule the CV gain is "unprovable", yet the larger
 test set agrees with it. That is an argument about the instrument, not about pretraining — and it is
 the case for `exp-20260913-04`.
+
+**Finding — the model was never undertrained; it was overfitting noisy labels.** exp-10 swept
+4/8/12 epochs on the L0 regex labels and gold CV fell *monotonically*: 0.6333 → 0.6127 → 0.5998.
+Training loss kept dropping the whole time. With a labeller whose pooled false-positive rate is 0.66
+(exp-03), extra epochs buy a better fit to the *noise*. This kills the "train longer" family of
+experiments under L0 and reframes them under L1 (exp-13), where the labels are much cleaner and the
+optimum may genuinely sit past 4 epochs.
 
 **Finding — σ is the binding constraint, not the model.** At smoke scale the significance bar is
 **Δ > 0.13 AUC**. More data and more seeds will shrink it, but fold noise on 58 studies is
