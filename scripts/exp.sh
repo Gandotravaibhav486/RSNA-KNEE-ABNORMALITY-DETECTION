@@ -6,6 +6,10 @@
 #   ./scripts/exp.sh watch  <exp-id>            # poll until the run ends
 #   ./scripts/exp.sh fetch  <exp-id>            # pull log + results json into results/
 #   ./scripts/exp.sh status                     # every experiment kernel, one line each
+#   ./scripts/exp.sh queue  <exp-id> <nb>       # wait for a free GPU slot, then push
+#
+# Kaggle allows at most 2 concurrent batch GPU sessions (measured 2026-09-14: a third push is
+# refused with "Maximum batch GPU session count of 2 reached"). CPU pushes are not subject to it.
 #
 # Parallelism: each experiment is its own kernel, so N experiments = N invocations of `push`.
 # They run concurrently on Kaggle's side, subject to the account's session limit and GPU quota.
@@ -30,6 +34,12 @@ cmd_new() {
 
 cmd_push() {
   local id=$1 nb=$2 hw=${3:-gpu} dir
+  # EXTRA_DS="owner/slug,owner/slug2" attaches more datasets to this run
+  local DATASETS="\"$WEIGHTS_DS\""
+  if [ -n "${EXTRA_DS:-}" ]; then
+    IFS="," read -ra _ds <<< "$EXTRA_DS"
+    for d in "${_ds[@]}"; do DATASETS="$DATASETS, \"$d\""; done
+  fi
   dir=$(mktemp -d)
   cp "$nb" "$dir/$(basename "$nb")"
   local gpu=true accel=(--accelerator NvidiaTeslaT4)
@@ -46,13 +56,23 @@ cmd_push() {
   "enable_gpu": $gpu,
   "enable_internet": false,
   "competition_sources": ["$COMP"],
-  "dataset_sources": ["$WEIGHTS_DS"],
+  "dataset_sources": [$DATASETS],
   "kernel_sources": ["$CACHE_KERNEL"],
   "model_sources": [],
   "version_notes": "$id"
 }
 JSON
-  (cd "$dir" && "$KAGGLE" kernels push -p . "${accel[@]}") | tail -1
+  local out
+  out=$( (cd "$dir" && "$KAGGLE" kernels push -p . "${accel[@]}") 2>&1 | tail -1 )
+  echo "$out"
+  case "$out" in
+    *"error"*|*"Maximum batch"*)
+      echo "NOT STARTED: $(kernel_ref "$id")" >&2
+      return 1 ;;
+  esac
+  mkdir -p "$REPO/results"
+  grep -qxF "$(kernel_ref "$id")" "$REPO/results/kernels.txt" 2>/dev/null \
+    || echo "$(kernel_ref "$id")" >> "$REPO/results/kernels.txt"
   echo "pushed: $(kernel_ref "$id")  [$hw]"
 }
 
@@ -81,15 +101,31 @@ cmd_fetch() {
 }
 
 cmd_status() {
-  printf '%-34s %s\n' KERNEL STATUS
-  "$KAGGLE" kernels list --user "$USER_SLUG" --page-size 50 2>/dev/null \
-    | awk 'NR>2 {print $1}' | grep -E 'rsna-knee' | while read -r ref; do
-      printf '%-34s %s\n' "${ref##*/}" "$("$KAGGLE" kernels status "$ref" 2>&1 | sed 's/.*status //;s/"//g' | tr -d '\n')"
-    done
+  printf '%-38s %s\n' KERNEL STATUS
+  [ -f "$REPO/results/kernels.txt" ] || { echo "(no pushes recorded yet)"; return 0; }
+  while read -r ref; do
+    [ -n "$ref" ] || continue
+    printf '%-38s %s\n' "${ref##*/}" \
+      "$("$KAGGLE" kernels status "$ref" 2>&1 | sed 's/.*status //;s/"//g' | tr -d '\n')"
+  done < "$REPO/results/kernels.txt"
+}
+
+cmd_queue() {
+  local id=$1 nb=$2 running
+  for _ in $(seq 1 240); do
+    running=$(cmd_status | grep -c RUNNING || true)
+    if [ "$running" -lt 2 ]; then
+      echo "$(date +%H:%M:%S) slot free ($running running) — pushing $id"
+      cmd_push "$id" "$nb" gpu && return 0
+    fi
+    sleep 60
+  done
+  echo "no GPU slot freed within 4 h"; return 1
 }
 
 case "${1:-}" in
   new)    cmd_new "$2" ;;
+  queue)  cmd_queue "$2" "$3" ;;
   push)   cmd_push "$2" "$3" "${4:-gpu}" ;;
   watch)  cmd_watch "$2" ;;
   fetch)  cmd_fetch "$2" ;;

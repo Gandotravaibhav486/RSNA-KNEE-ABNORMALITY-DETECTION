@@ -171,8 +171,10 @@ Pushing starts a run immediately, so N experiments launched = N runs going at on
 **What actually limits parallelism — in this order:**
 1. **GPU quota**, ~24 usable h/week (§8). Four concurrent GPU runs burn it four times faster; the
    weekly ledger is the real budget, not the session count.
-2. **Concurrent session limit** on the account — **[verify]**, discoverable by pushing two GPU
-   kernels and seeing whether the second queues. Until verified, assume it is small.
+2. **Concurrent session limit: 2 batch GPU sessions.** Measured 2026-09-14 — a third push is
+   refused outright with `Maximum batch GPU session count of 2 reached`, and the kernel is created
+   but never runs. CPU pushes are not subject to it. `./scripts/exp.sh queue <id> <nb>` waits for a
+   free slot and pushes then.
 3. **Nothing else.** Kernels are fully isolated: separate containers, separate `/kaggle/working`.
 
 **Therefore: put CPU-only work on CPU kernels.** Label experiments, analyses and cache builds cost

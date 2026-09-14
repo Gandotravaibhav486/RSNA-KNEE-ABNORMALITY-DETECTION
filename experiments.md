@@ -78,6 +78,23 @@ field's *non-LLM* baseline. Public LLM label sets exist and external public data
 Separately, they measure encoder scaling (DINOv2-S→B) at +0.0011 against a 0.0020 noise floor —
 capacity is not the constraint; a crop-geometry fix paid +0.0059 and moved 10/12 labels.
 
+**exp-08 gate 1 — public LLM label keys scored against our 58 gold studies (CPU, 2026-09-14):**
+
+| key | macro AUC | cells left at 0.5 |
+|---|---|---|
+| our `v1-keyword` regex | 0.6879 | 65.2% undecided |
+| `llm_labels_full` | 0.8780 | 26.6% |
+| `llm_labels_v2` | 0.8873 | 21.0% |
+| **`llm_labels_v4_blend`** | **0.8927** | 0.0% |
+
+Per-target gain of v4_blend over our regex — **every target improves**, smallest +0.019:
+PF OA +0.336, Medial Meniscus +0.315, MCL +0.274, ACL +0.263, Effusion +0.237, Contusion +0.195,
+Lateral OA +0.183, Lateral Meniscus +0.180, Medial OA +0.177, Baker's +0.147, Synovitis +0.132,
+Fracture +0.019.
+
+MCL — the target our model scores 0.365 on and which exp-03 could not diagnose — goes 0.694 → 0.968
+in the label key alone.
+
 ### Accepted improvements (inside a lineage, baseline unchanged)
 
 | exp-id | lineage | Δ CV | closure % | LB | why it did not promote |
