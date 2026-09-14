@@ -84,6 +84,45 @@ capacity is not the constraint; a crop-geometry fix paid +0.0059 and moved 10/12
 |---|---|---|---|---|---|
 | — | — | — | — | — | — |
 
+## Dependency tree — what can run at once, and what must wait
+
+An edge means **"the result cannot be interpreted without the parent"**, not merely that one runs
+before the other. Independent roots can be pushed simultaneously (`scripts/exp.sh push`, AGENTS.md §9).
+
+```
+exp-08  LLM labels ............ root, independent    [CPU label build + 0.4 GPU h]
+  └── exp-09  silence policy ... also needs exp-04
+  └╌╌ exp-07  regex precision .. ONLY if exp-08 fails or is disallowed
+
+exp-04  screening metric ...... root, running        [0.48 GPU h]
+  ├── exp-09  silence policy ... effect ≈0.01, invisible on gold
+  ├── exp-10  epoch sweep ...... effect likely <2σ gold
+  └── exp-11  geometry ......... also needs exp-06
+
+exp-06  runtime truth ......... root, independent    [~0 GPU]
+  └── exp-11  geometry ......... more windows costs runtime; Efficiency Prize scores it
+```
+
+**Why exp-08 is a root and everything else is not.** A label change from 0.6879 → 0.8780 is a
++0.19 effect on label quality. That is the one queued experiment plausibly large enough to clear the
+gold set's 2σ bar of 0.1110 on its own, so it does not need the new instrument to be readable.
+Everything else is expected to move the metric by 0.005–0.05 — invisible on gold, hence the edge
+from exp-04.
+
+**Why exp-09 has two parents.** It modifies *whichever* label set is in use, so its content depends
+on exp-08's outcome (our regex's unknowns, or the LLM key's "not addressed" cells), and its effect
+(~+0.009 measured by a competitor) is far too small to read on gold, so it also needs exp-04.
+
+**Why exp-10 is not a parent of exp-08/09.** Epochs and labels are orthogonal changes. But there is
+a weaker coupling worth stating: if the model is undertrained at 4 epochs, a label improvement
+evaluated at 4 epochs under-reads. Run exp-10 early for that reason, but it does not gate.
+
+**Resolved nodes:** exp-03 done (+1). exp-02 rejected on exp-03's evidence. exp-05 **absorbed** —
+exp-04 *is* the paired pretrained-vs-random comparison, run properly out-of-fold.
+
+**Parallel batch that can start today:** exp-08's label build (CPU), exp-06 (CPU), and exp-10 (GPU)
+are mutually independent. exp-04 is already running and gates the reading of exp-10.
+
 ## Ledger
 
 | exp-id | date | type | change | hypothesis | baseline CV | new CV | Δ CV | public LB | lead ±1 | status |
