@@ -11,7 +11,7 @@ Append-only. One row per experiment, proposed or run. Rejected proposals stay in
 | Metric | macro ROC AUC over 12 targets *(verify against competition page)* |
 | CV protocol | 3 training seeds `[2026,2027,2028]`; evaluation = 5 folds × 5 repeats over the 58 gold studies; σ from the 900 (seed,repeat,fold) cells |
 | Baseline CV score | **0.6339** macro AUC on the 58 gold studies (mean of 3 seeds; 3-seed ensemble 0.6442) |
-| Baseline public LB | submitted 2026-09-13 19:39 UTC, **pending** (notebook `rsna-knee-baseline-v1-full` v4). The 0.936 in the history is the copied public ensemble, not our pipeline. |
+| Baseline public LB | **0.641** (submission 56213958, notebook `rsna-knee-baseline-v1-full` v4). The 0.936 in the history is the copied public ensemble, not our pipeline. |
 | Baseline commit | `notebooks/baseline-v1.ipynb` @ this commit; Kaggle notebook version 4; cache `p1`; labeller `v1-keyword` |
 | Baseline notebook | **`notebooks/baseline-v1.ipynb`** (built 2026-09-13, all in-notebook tests pass, not yet run on GPU) |
 | Weak labeller `v1-keyword` | **macro AUC 0.6879 on the 58 gold studies** — measured 2026-09-13, CPU only. This is the floor the image model must beat. |
@@ -33,7 +33,7 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 
 | lineage | approach family | notebook / branch | CV | public LB | promoted via | date |
 |---|---|---|---|---|---|---|
-| L0 | weak-label CNN (resnet18 + per-target attention over 12 windows) | `notebooks/baseline-v1.ipynb` / `main` | **0.6339** ± σ 0.0555 | pending | initial | 2026-09-13 |
+| L0 | weak-label CNN (resnet18 + per-target attention over 12 windows) | `notebooks/baseline-v1.ipynb` / `main` | **0.6339** ± σ 0.0555 | **0.641** | initial | 2026-09-13 |
 
 ### Measured facts from the smoke run (2026-09-13, Kaggle, CPU fallback)
 
@@ -46,12 +46,21 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 | inference | **2.01 s/study** (cold cache, CPU) | 5,000 hidden studies → 2.79 h, inside the 6.75 h limit |
 | offline weights | loaded, 122 tensors, 0 missing, internet OFF | submission environment validated |
 
-**Finding — gold CV tracks the public LB closely.** The random-init run scored **0.6039 macro AUC
-on the 58 gold studies** and **0.595 on the public leaderboard** — a gap of 0.009, well inside σ.
-On this single point, gold CV looks like a roughly unbiased estimator of LB, which is better news
-than a 58-study validation set deserves. It does **not** shrink σ: the bar for calling a change
-real is still ±2σ, and one agreeing point is not a calibration curve. Re-check it at the next
-submission.
+**Finding — gold CV tracks the public LB, on both points we have.**
+
+| run | gold CV | public LB | gap |
+|---|---|---|---|
+| random-init ablation | 0.6039 | 0.595 | −0.009 |
+| baseline L0 (pretrained + cache) | 0.6339 | **0.641** | +0.007 |
+
+Both gaps are well inside σ, and the LB ordering matches the CV ordering. Gold CV is not lying to us
+about direction. It does **not** shrink σ — the ±2σ bar still stands — and two points are not a
+calibration curve.
+
+Note what the pair also says about pretraining: **+0.030 on CV, +0.046 on the LB**, and the LB is
+scored on far more studies than 58. By our own 2σ rule the CV gain is "unprovable", yet the larger
+test set agrees with it. That is an argument about the instrument, not about pretraining — and it is
+the case for `exp-20260913-04`.
 
 **Finding — σ is the binding constraint, not the model.** At smoke scale the significance bar is
 **Δ > 0.13 AUC**. More data and more seeds will shrink it, but fold noise on 58 studies is
