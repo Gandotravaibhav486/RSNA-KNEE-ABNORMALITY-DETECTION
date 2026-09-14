@@ -144,7 +144,46 @@ A "fix attempt" is one debug-and-rerun cycle after the first run fails or underp
   **170 h [verify with the real quota]**. Architecture experiments at 3 h each would consume it in
   ~56 runs; spend it on screening runs and paper experiments first.
 
-## 9. Worktree layout and isolation
+## 9. Running experiments in parallel
+
+Parallelism has **two layers**, and the worktree is only the first.
+
+**Layer 1 — code isolation (local).** One git worktree per experiment, so two agents editing
+notebooks never collide:
+
+```bash
+./scripts/exp.sh new exp-YYYYMMDD-NN-slug     # worktree + branch of the same name
+```
+
+**Layer 2 — execution (Kaggle).** *Worktrees do not make anything run in parallel.* Execution
+parallelism comes from each experiment owning its **own kernel**: `vaibhav486/rsna-knee-<exp-id>`.
+Pushing starts a run immediately, so N experiments launched = N runs going at once:
+
+```bash
+./scripts/exp.sh push exp-A notebooks/exp-A.ipynb        # GPU (NvidiaTeslaT4)
+./scripts/exp.sh push exp-B notebooks/exp-B.ipynb cpu    # CPU: no GPU quota consumed
+./scripts/exp.sh status                                  # all experiment kernels, one line each
+./scripts/exp.sh watch exp-A && ./scripts/exp.sh fetch exp-A
+```
+
+`fetch` writes `results/<exp-id>/` (log + results json) and deletes any multi-GB cache the run wrote.
+
+**What actually limits parallelism — in this order:**
+1. **GPU quota**, ~24 usable h/week (§8). Four concurrent GPU runs burn it four times faster; the
+   weekly ledger is the real budget, not the session count.
+2. **Concurrent session limit** on the account — **[verify]**, discoverable by pushing two GPU
+   kernels and seeing whether the second queues. Until verified, assume it is small.
+3. **Nothing else.** Kernels are fully isolated: separate containers, separate `/kaggle/working`.
+
+**Therefore: put CPU-only work on CPU kernels.** Label experiments, analyses and cache builds cost
+zero GPU quota and can run many-at-once regardless. Reserve GPU concurrency for experiments that
+genuinely need it.
+
+**Shared-file discipline.** `experiments.md`, `agent-log.md` and `handoff.md` live on `main` and are
+append-only. One row per commit, rebase before pushing — never merge a whole experiment branch into
+the ledger. Results land as `results/<exp-id>/` and are committed from the worktree's branch.
+
+## 9b. Worktree layout and isolation
 
 ```
 /Users/vaibhavgandotra/RSNA                      # main: baseline + docs, no experiments run here
