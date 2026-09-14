@@ -40,6 +40,10 @@ cmd_push() {
     IFS="," read -ra _ds <<< "$EXTRA_DS"
     for d in "${_ds[@]}"; do DATASETS="$DATASETS, \"$d\""; done
   fi
+  local KERNELS="\"$CACHE_KERNEL\""
+  [ "${NO_CACHE:-0}" = 1 ] && KERNELS=""
+  local MODELS=""
+  if [ -n "${MODEL_SRC:-}" ]; then MODELS="\"$MODEL_SRC\""; fi
   dir=$(mktemp -d)
   cp "$nb" "$dir/$(basename "$nb")"
   local gpu=true accel=(--accelerator NvidiaTeslaT4)
@@ -57,8 +61,8 @@ cmd_push() {
   "enable_internet": false,
   "competition_sources": ["$COMP"],
   "dataset_sources": [$DATASETS],
-  "kernel_sources": ["$CACHE_KERNEL"],
-  "model_sources": [],
+  "kernel_sources": [$KERNELS],
+  "model_sources": [$MODELS],
   "version_notes": "$id"
 }
 JSON
