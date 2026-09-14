@@ -43,7 +43,8 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 
 | lineage | approach family | notebook / branch | CV | public LB | promoted via | date |
 |---|---|---|---|---|---|---|
-| L0 | weak-label CNN (resnet18 + per-target attention over 12 windows) | `notebooks/baseline-v1.ipynb` / `main` | **0.6339** ± σ 0.0555 | **0.641** | initial | 2026-09-13 |
+| L0 | weak-label CNN, **regex labels** (resnet18 + per-target attention, 12 windows) | `notebooks/baseline-v1.ipynb` / `main` | 0.6339 ± σ 0.0555 | 0.641 | initial | 2026-09-13 |
+| **L1** | same model, **public LLM label key** `llm_labels_v4_blend` | `notebooks/exp-08-llm-labels.ipynb` | **0.7642** ± σ 0.0459 (ensemble 0.7760) | not yet submitted | **gate A: 35.6% error-gap closure** | 2026-09-14 |
 
 ### Measured facts from the smoke run (2026-09-13, Kaggle, CPU fallback)
 
