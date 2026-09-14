@@ -17,8 +17,18 @@ Append-only. One row per experiment, proposed or run. Rejected proposals stay in
 | Weak labeller `v1-keyword` | **macro AUC 0.6879 on the 58 gold studies** — measured 2026-09-13, CPU only. This is the floor the image model must beat. |
 | Date measured | 2026-09-13 (Kaggle, Tesla T4, 0.36 GPU h) |
 
-**Baseline is measured.** The significance bar for every later experiment is **Δ > 0.1110 (2σ)**
-on gold CV, computed from the 900 evaluation cells of this run.
+**Baseline is measured.** Gold CV bar: **Δ > 0.1110 (2σ)** from the 900 evaluation cells of this run.
+
+**The primary instrument is now the screening metric (exp-04, adopted 2026-09-14):** 3-fold OOF over
+the 3,406 weakly-labelled studies, **2σ bar = 0.0182** — 6× tighter than gold. Gold remains the
+confirmation set and the only thing measured against real annotations; the screening metric measures
+agreement with weak labels and is for **ranking variants**, never for quoting a score.
+
+| instrument | n | 2σ bar | cost |
+|---|---|---|---|
+| 58 gold studies | 58 | 0.1110 | free (rides along) |
+| screening metric | 3,406 | **0.0182** | 0.22 GPU h per arm (3 folds) |
+| public LB | hidden | ~unknown | 1 submission/day |
 
 **The headline problem:** the image model scores **0.6339**, the weak labeller alone scores
 **0.6879**. The model is *worse than the text rules it was trained on*. It cannot exceed its label
@@ -151,7 +161,7 @@ are mutually independent. exp-04 is already running and gates the reading of exp
 | [`exp-20260913-03-coverage-ceiling`](experiments/exp-20260913-03-coverage-ceiling.md) | 2026-09-14 | paper | Ceiling analysis. Found the ceiling question ill-posed (noise caps sample efficiency, not AUC) and measured what does matter: the labeller's **pooled false-positive rate is 0.66 (CI 0.568–0.738)** while its miss rate is 0.02 | The labeller is a mention detector, not a classifier; OA/Synovitis labels are ~95% positive and carry almost no gradient | 0.6879 | n/a | n/a | n/a | **+1** | done |
 | `exp-20260914-05-pretrain-ablation` | 2026-09-14 | paper | Paired comparison of the two runs we already have: pretrained (0.6339) vs random init (0.6039), using the saved `gold_probs_seed*.npy` — no GPU | Δ=+0.030 is only 0.27σ, so ImageNet pretraining is **not** provably worth anything here by our own bar. Paired cells will say it far more tightly than the marginal σ does | 0.6339 | — | — | — | — | proposed |
 | `exp-20260914-06-inference-timing` | 2026-09-14 | packaging | Re-measure inference seconds with the test studies **excluded from the cache** | The 0.08 s/study this run reported is an artefact — the cache build included test UIDs, so "inference" read prebuilt tensors. The hidden test set will never be cached | — | — | — | — | — | proposed |
-| `exp-20260913-04-screening-metric` | 2026-09-13 | split | Use agreement with weak labels on ~3,400 held-out reported studies as the *screening* metric, gold as confirmation | 2σ on gold is ~0.13 AUC — most experiments are unprovable there; a 3,400-study signal has far tighter error bars even though its labels are noisier | 0.6879 | — | — | — | — | proposed |
+| [`exp-20260913-04-screening-metric`](experiments/exp-20260913-04-screening-metric.md) | 2026-09-14 | split | 3-fold OOF over 3,406 weak studies as the screening metric. **Adopted.** | Gold's 2σ bar of 0.1110 cannot see effects the LB proves real | — | see below | — | — | **+1** | done |
 
 `type` ∈ `data-analysis` \| `split` \| `loss` \| `architecture` \| `training` \| `paper`
 (`paper` = inferred without GPU spend).

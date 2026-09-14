@@ -1,0 +1,14 @@
+{
+  "screen_pretrained": 0.7773,
+  "screen_random": 0.697,
+  "delta": 0.0806,
+  "sigma": 0.0091,
+  "bar": 0.0182,
+  "ci": [
+    0.063,
+    0.097
+  ],
+  "gold_pretrained": 0.6524,
+  "gold_random": 0.6379,
+  "n": 3406
+}
