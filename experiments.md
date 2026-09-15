@@ -84,6 +84,21 @@ scored on far more studies than 58. By our own 2σ rule the CV gain is "unprovab
 test set agrees with it. That is an argument about the instrument, not about pretraining — and it is
 the case for `exp-20260913-04`.
 
+**Finding — the epoch decline was a label-noise artefact, and it vanished with clean labels.**
+
+| epochs | L0 regex labels | L1 LLM labels |
+|---|---|---|
+| 2 | — | 0.7264 |
+| 4 | **0.6333** | **0.7699** |
+| 8 | 0.6127 | 0.7492 |
+| 12 | 0.5998 | 0.7792 |
+
+Under L0 the curve falls monotonically — textbook memorisation of label noise. Under L1 the decline
+is **gone**, but what replaces it is not a rising curve, it is a **jagged one**: 4 and 12 epochs are
+within 0.009 of each other with an 8-epoch dip between them. Single seed per arm, gold σ ≈ 0.046 →
+gold cannot resolve this, and the honest verdict is "no reason to pay 3× GPU for 12 epochs".
+The mechanism claim survives; the schedule question moves to the screening metric (exp-15).
+
 **Finding — the model was never undertrained; it was overfitting noisy labels.** exp-10 swept
 4/8/12 epochs on the L0 regex labels and gold CV fell *monotonically*: 0.6333 → 0.6127 → 0.5998.
 Training loss kept dropping the whole time. With a labeller whose pooled false-positive rate is 0.66

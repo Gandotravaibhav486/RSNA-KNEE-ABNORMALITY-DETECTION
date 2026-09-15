@@ -18,7 +18,7 @@ set -euo pipefail
 KAGGLE=${KAGGLE:-/Applications/anaconda3/bin/kaggle}
 USER_SLUG=${KAGGLE_USER:-vaibhav486}
 REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-CACHE_KERNEL="$USER_SLUG/rsna-knee-cache-build-p1"
+CACHE_KERNEL="${CACHE_KERNEL_OVERRIDE:-$USER_SLUG/rsna-knee-cache-build-p1}"
 WEIGHTS_DS="$USER_SLUG/timm-backbones-offline"
 COMP="rsna-knee-abnormality-detection"
 
