@@ -102,6 +102,9 @@ cmd_fetch() {
   out="$REPO/results/$id"
   mkdir -p "$out"
   "$KAGGLE" kernels logs "$ref" > "$out/log.json" 2>/dev/null || true
+  # kaggle skips files that already exist locally, so a re-fetch after a NEW VERSION silently
+  # keeps the OLD artefacts. That produced a wrong paired comparison once. Clear them first.
+  find "$out" -type f ! -name 'log.json' ! -name '*.log' -delete 2>/dev/null || true
   "$KAGGLE" kernels output "$ref" -p "$out" >/dev/null 2>&1 || true
   # keep the small artefacts, drop the multi-GB caches a run may have written
   find "$out" -name '*.npz' -delete 2>/dev/null || true
