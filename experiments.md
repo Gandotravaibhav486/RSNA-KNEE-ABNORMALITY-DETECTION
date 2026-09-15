@@ -84,6 +84,13 @@ scored on far more studies than 58. By our own 2σ rule the CV gain is "unprovab
 test set agrees with it. That is an argument about the instrument, not about pretraining — and it is
 the case for `exp-20260913-04`.
 
+**Finding — pairing is worth 4× the sample size, and costs nothing.** exp-11 vs the L1 baseline on
+the same 58 gold studies: the *marginal* gold bar is 0.1110, but a **paired** bootstrap over the same
+studies with both runs' saved `gold_probs_*.npy` gives σ(Δ)=0.0127, i.e. a bar of **0.0254** — 4.4×
+tighter, for zero GPU. Every future comparison should be paired from saved predictions before anyone
+argues about a marginal number. (It still was not enough here: Δ=+0.0154, CI [−0.0081, +0.0410],
+P(Δ>0)=0.89.)
+
 **Finding — the epoch decline was a label-noise artefact, and it vanished with clean labels.**
 
 | epochs | L0 regex labels | L1 LLM labels |
