@@ -191,6 +191,11 @@ exp-04 *is* the paired pretrained-vs-random comparison, run properly out-of-fold
 **Parallel batch that can start today:** exp-08's label build (CPU), exp-06 (CPU), and exp-10 (GPU)
 are mutually independent. exp-04 is already running and gates the reading of exp-10.
 
+**Version axes.** `PREPROC_VERSION` (`p1`/`p2`) keys the tensor cache. `TRAIN_VERSION` (`t1`/`t2`)
+keys the training stream — introduced 2026-09-16 because the augmentation fix changes results
+without changing a single cached tensor. A `p2/t2` result is not comparable to a `p2/t1` result, and
+the pair says so at a glance. Everything before exp-17 is implicitly `t1`.
+
 ## Ledger
 
 | exp-id | date | type | change | hypothesis | baseline CV | new CV | Δ CV | public LB | lead ±1 | status |
