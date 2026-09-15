@@ -3,106 +3,110 @@
 Updated before the end of every long session (AGENTS.md §10). Overwrite "Current state";
 append to "Log".
 
-## Current state — 2026-09-15
+## Current state — 2026-09-16
 
-**Lineage L1 is the baseline: gold CV 0.7642, public LB 0.803.** One label change did it.
+**Best measured config: L1 labels + p2 geometry — gold CV 0.7794 (ensemble 0.7914).**
+Best *confirmed on the leaderboard*: L1 at **0.803**. The p2 submission is pending.
 
 | | value |
 |---|---|
-| **L1 gold CV** | **0.7642** (3 seeds, ensemble 0.7760) — public LLM label key `llm_labels_v4_blend` |
-| **L1 public LB** | **0.803** (submission 56235067) |
-| L0 (regex labels) | CV 0.6339, LB 0.641 |
-| **Primary instrument** | **screening metric v2, 2σ = 0.0068** — 16× tighter than gold |
-| Gold σ / bar | 0.0555 → Δ > 0.1110 — confirmation set only now |
-| GPU spent so far | ≈4.3 h of the ~24 h/week |
-| Deadline | **final submission 2026-10-22** — 37 days |
+| **Lineage L1** (public LLM label key) | gold CV 0.7642 · screening 0.7419 · **LB 0.803** |
+| **+ p2 geometry** (accepted improvement, not a promotion) | gold CV **0.7794** (ens 0.7914) · screening **0.7501** · LB pending |
+| L0 (regex labels) | CV 0.6339 · LB 0.641 |
+| Bars: gold marginal / gold paired / screening paired | 0.1110 / 0.0254 / **0.0044** |
+| Honest inference cost at p2 | **3.69 s/study** → 5.13 h at 5,000 hidden studies (cap 9 h, working limit 6.75 h) |
+| GPU used | ≈6.4 h of ~24 h/week |
+| Deadline | **2026-10-22** — 36 days |
 
-## In flight right now
+## In flight
 
-| kernel | what | expect |
-|---|---|---|
-| `exp-13-epochs-L1` | epoch sweep 2/4/8/12 on the **L1** key | does the optimum move once labels are clean? |
-| `cache-build-p2` | CPU, 6 slots × 3 windows @224, **train studies only** | the cache exp-11 needs; also makes inference timing honest |
+- `exp-17-t2-independent-flips` — running. Screened at p2, paired against exp-16's OOF.
+- Submission **56261446** — p2 geometry, real predictions, pending. The fourth CV/LB point.
+- Submissions 56261421 / 56261500 — screening notebooks with no inference cell; these score 0.500
+  and carry no information.
 
-`exp-11` (geometry) is ready to push the moment `cache-build-p2` completes — it needs
-`CACHE_INPUT_DIRS` pointed at the p2 output and `PREPROC_VERSION = "p2"`.
+## Version axes — read this before comparing any two numbers
 
-## What we learned, in the order it matters
+- `PREPROC_VERSION` `p1` (3 slots × 4 windows @192, K=12) / `p2` (6 slots × 3 @224, K=18). Keys the
+  tensor cache.
+- `TRAIN_VERSION` `t1` / `t2` — new 2026-09-16. Keys the *training stream*. t2 fixes the flip RNG;
+  cached tensors are identical, so `p2/t2` is **not** comparable to `p2/t1`.
+- Lineage `L0` regex labels / `L1` public LLM key.
 
-1. **Labels were the binding constraint, and the fix is bought, not built.** Swapping our regex key
-   (0.6879 on gold) for the public LLM key (0.8927) moved CV +0.1303 and the LB +0.162. Nothing else
-   changed — same model, folds, seeds, cache, epochs.
-2. **Measurement was the second constraint.** 58 gold studies give a 2σ bar of 0.1110, which cannot
-   see effects the LB proves real. The screening metric (3-fold OOF over 3,406 studies, scored
-   against the L1 key) gives **0.0068**. Everything small is nowmeasurable.
-3. **The model overfits noisy labels rather than underfitting.** exp-10: 4→8→12 epochs on L0 gave
-   0.6333 → 0.6127 → 0.5998, monotone down, while training loss kept falling. exp-13 re-asks this
-   under clean labels.
-4. **A "not addressed" option needs a cost.** exp-12's own prompt let Qwen2.5-7B answer "not
-   addressed" for 74.9% of cells (public key: 25.4%) and emit explicit negatives 1.5% of the time —
-   the mirror image of the regex's 0.66 false-positive rate.
-5. **CV predicts direction, not level.** CV/LB gaps: −0.009, +0.007, **+0.039**. The offset grows as
-   the model improves, probably because gold is the annotator's sampling (every gold study has ≥1
-   positive, mean 4.14 findings) rather than the test distribution.
+## What we know, in the order it should drive decisions
 
-## Queue, in order
+1. **Labels were the binding constraint.** Regex 0.6879 → LLM key 0.8927 on gold moved CV +0.1303
+   and LB +0.162. Nothing else changed. 35.6% CV / 45.1% LB error-gap closure → L1 promoted.
+2. **Measure paired, always.** On the same 58 gold studies the marginal bar is 0.1110 and the
+   **paired** bar is 0.0254 — 4.4× tighter, for zero GPU, just from keeping `gold_probs_*.npy`.
+   On the screening pool, paired gives **0.0044**.
+3. **Geometry is real but small.** 18 windows @224 vs 12 @192: +0.0154 on gold (unresolvable) and
+   **+0.0082 paired on the screening metric, CI [+0.0041, +0.0125], P=1.00** → +1. It costs 2.4× the
+   training GPU and ~1.5 h more inference headroom.
+4. **The model overfits noisy labels rather than underfitting.** Epochs 4→12 on L0: 0.6333 → 0.5998,
+   monotone down. On L1 the decline vanishes but no schedule wins — jagged, single seed, unresolved.
+5. **An LLM label prompt needs a cost on "not addressed".** Our own key (exp-12) answered "not
+   addressed" for 74.9% of cells (public key 25.4%) and scored 0.7125 — killed on two criteria.
+6. **CV predicts direction, not level.** CV/LB gaps: −0.009, +0.007, +0.039 and widening.
 
-1. **exp-11 geometry** — 6 slots × 224 px vs 3 × 192. A competitor measured crop geometry at +0.0059
-   across 10/12 labels while encoder scaling was a null. Push when p2 finishes.
+## Queue
+
+1. **Read exp-17.** If Δ < 0.0044, adopt t2 anyway — it is a correctness fix; just don't claim a gain.
 2. **exp-09 per-finding silence** — silence ⇒ negative for Baker's / Medial OA (gold-positive 0.03 /
-   0.00 when the report is silent), unknown for Synovitis (0.34). Never blanket — the community
-   measured blanket imputation *losing* 0.0068.
-3. **exp-14 own LLM key, reopened** — only with prompt v2 (a cost on "not addressed") **and** batched
-   generation. Must beat 0.80 on gold-test in a pilot before any full run. 1 of 3 fix attempts used.
-4. **Confidence-weighted loss** — the L1 key is soft, and `2·|p−0.5|` is the natural weight, which
-   sends "not addressed" cells to zero automatically. Cheap, untested, sits inside L1.
-5. **Blend keys** — the public v4 gained most from its *weakest* partner because it was least
-   correlated. Any second key we build has value even below 0.89.
+   0.00 when silent), unknown for Synovitis (0.34). Never blanket: the community measured blanket
+   imputation *losing* 0.0068.
+3. **Confidence-weighted loss** — the L1 key is soft; `2·|p−0.5|` sends "not addressed" cells to zero
+   weight automatically. Cheap, untested, inside L1.
+4. **exp-15 epochs on the screening metric** — 4 vs 12 at p2/t2, since gold could not resolve it.
+5. **Split training out of the submission notebook** — publish weights as a dataset so the rerun only
+   infers. Saves ~0.7 h of rerun time, makes the submitted artefact exactly the measured one, and
+   matters for the Efficiency Prize.
+6. **exp-14, our own label key, reopened** — only with prompt v2 (a cost on "not addressed") *and*
+   batched generation. Must beat 0.80 on gold-test in a pilot. 1 of 3 fix attempts used.
 
-## Environment facts (do not re-learn these)
+## Traps already paid for — do not rediscover these
 
-- `kaggle kernels push --accelerator NvidiaTeslaT4`. Valid: `NvidiaTeslaT4` / `NvidiaTeslaP100` /
-  `Tpu1VmV38`. Anything else is silently ignored → P100 (sm_60), which this PyTorch cannot use.
-  A CLI push overwrites the accelerator chosen in the UI.
-- **2 concurrent batch GPU sessions, measured.** A third push is refused. CPU pushes are exempt —
-  `./scripts/exp.sh push <id> <nb> cpu`, and `queue` waits for a slot.
-- Mounts are **nested**: `/kaggle/input/{datasets,notebooks,competitions,models}/<owner>/<slug>/…`.
-  Notebooks discover their inputs rather than assuming a layout.
-- Kernel logs are only exposed after a run completes.
-- Training is decode-bound: ~50 s/epoch on 3,406 cached studies.
-- `preflight()` (fails a `full` run before epoch 1 if weights or cache are missing) and
-  `scripts/lint_nb.py` (pyflakes pre-push gate) exist because every failure so far died *after* the
-  expensive part.
-- LLM-derived labels are explicitly permitted by the host (discussion 733965).
+- **`kaggle kernels output` skips files that already exist locally.** A re-fetch after a new version
+  silently keeps the old artefacts; this produced a paired estimate 12× too large, caught only
+  because the number was implausible. `exp.sh fetch` now clears first.
+- **Submitting a screening notebook wastes a slot** — no inference cell means `submission.csv` is the
+  0.5 fallback. Check it is not constant before submitting. (Cost two slots so far.)
+- `--accelerator NvidiaTeslaT4` is the only usable GPU enum; anything else silently gives a P100
+  (sm_60) this PyTorch cannot run on, and a CLI push overwrites the UI's choice.
+- **2 concurrent batch GPU sessions.** CPU pushes are exempt; `exp.sh queue` waits for a slot.
+- Mounts are nested: `/kaggle/input/{datasets,notebooks,competitions,models}/<owner>/<slug>/…`.
+- Kernel logs appear only after a run completes.
+- `preflight()` and `scripts/lint_nb.py` exist because **every failure so far died after the
+  expensive part**, never before it.
+- Determinism holds *within* an accelerator (exp-08 and exp-13 both produced 0.7699 for seed 2026)
+  but not across devices (CPU 0.5637 vs T4 0.5728). `cudnn.deterministic` is **not** set.
 
 ## Assets on Kaggle
 
 | what | ref |
 |---|---|
-| L1 baseline notebook | `vaibhav486/rsna-knee-exp-08-llm-labels` |
-| screening metric | `vaibhav486/rsna-knee-exp-04-screening-metric` (v2 = L1 key) |
-| tensor cache p1 | `vaibhav486/rsna-knee-cache-build-p1` (4,410 studies, 4.84 GB) |
-| tensor cache p2 | `vaibhav486/rsna-knee-cache-build-p2` (building) |
+| L1 baseline | `vaibhav486/rsna-knee-exp-08-llm-labels` |
+| L1 + p2 geometry | `vaibhav486/rsna-knee-exp-11-geometry-p2` |
+| screening metric (p1 / p2) | `…exp-04-screening-metric` / `…exp-16-screen-p2` |
+| tensor caches | `…cache-build-p1` (4,410 studies, 4.84 GB) · `…cache-build-p2` (4,407 train-only, 8.0 GB) |
 | offline backbones | `vaibhav486/timm-backbones-offline` (Apache-2.0) |
 | public label key | `stevenleehans/rsna-knee-llm-report-labels` (CC0) |
 
 ## Open items
 
-- The L1 key's prompt and model are **unpublished**. We cannot reproduce or extend it, which sits
-  awkwardly with the winners' open-source obligation. exp-14 is the answer if it can be made to work.
-- We hardcode ImageNet `mean`/`std`; read `preprocessor_config.json` instead before swapping encoders.
-- Still `[verify]` in rules.md: the Efficiency-Prize formula, hidden test size, daily submission cap.
-- `.claude/`, `.agents/`, `skills-lock.json` untracked — track or leave?
-- Submitting a notebook that has no inference cell wastes a slot (exp-04 scored 0.500). Check
-  `submission.csv` is not the fallback before submitting.
+- The L1 key's prompt and model are unpublished — we cannot reproduce or extend what the baseline
+  now depends on. Relevant to the winners' open-source obligation.
+- We hardcode ImageNet `mean`/`std`; read `preprocessor_config.json` before swapping encoders.
+- Still `[verify]`: Efficiency-Prize formula, hidden test size, daily submission cap.
+- `.claude/`, `.agents/`, `skills-lock.json` untracked.
 
 ## Log
 
-- **2026-09-15** — exp-12 −1 (own LLM key: 0.7125 gold-test, 11.7 h corpus, 74.9% "not addressed").
-  exp-13 and cache-p2 launched. Fixed `exp.sh`'s cpu push path (macOS bash 3.2 empty-array bug).
-- **2026-09-14** — **exp-08 +1 → L1 promoted** (CV 0.6339→0.7642, LB 0.641→0.803, 45.1% LB error-gap
-  closure). exp-04 +1, screening metric adopted (2σ 0.0182 → 0.0068 on the L1 key). exp-10 −1
-  (more epochs is worse). exp-03 +1 (labeller is a mention detector; killed exp-02 before it ran).
-  Read the competition discussions; built `scripts/exp.sh` and the notebook lint.
-- **2026-09-13** — baseline L0 measured (CV 0.6339, LB 0.641) and submitted; cache p1 built
-  (4,410 studies, 0 errors); governance docs written.
+- **2026-09-16** — exp-16 **+1** (geometry confirmed, +0.0082 paired on the screening metric);
+  exp-11 promoted to +1; p2 submitted (pending). exp-17 `t2-independent-flips` launched and the
+  `TRAIN_VERSION` axis introduced. Fixed the stale-fetch trap in `exp.sh`.
+- **2026-09-15** — exp-13 −1 (epoch decline was label noise; vanishes under L1, no schedule wins).
+  exp-12 −1 (own LLM key: 0.7125, 11.7 h corpus, 74.9% "not addressed"). cache p2 built. exp-11 run.
+- **2026-09-14** — **exp-08 +1 → L1** (CV 0.7642, LB 0.803). exp-04 +1, screening metric adopted.
+  exp-10 −1. exp-03 +1 (killed exp-02 unrun). Discussions read; `exp.sh` and the notebook lint built.
+- **2026-09-13** — baseline L0 measured (CV 0.6339, LB 0.641); cache p1 built; governance docs written.
