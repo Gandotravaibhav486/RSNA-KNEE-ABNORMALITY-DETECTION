@@ -50,6 +50,7 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 |---|---|---|---|---|---|---|
 | L0 | weak-label CNN, **regex labels** (resnet18 + per-target attention, 12 windows) | `notebooks/baseline-v1.ipynb` / `main` | 0.6339 ± σ 0.0555 | 0.641 | initial | 2026-09-13 |
 | **L1** | same model, **public LLM label key** `llm_labels_v4_blend` | `notebooks/exp-08-llm-labels.ipynb` | **0.7642** ± σ 0.0459 (ensemble 0.7760) | **0.803** | **gate A: 35.6% CV closure, 45.1% on LB; confirmed on LB** | 2026-09-14 |
+| L1 + p2 | same, 18 windows @224 | `notebooks/exp-11-geometry-p2.ipynb` | 0.7794 (ens 0.7914) | **0.808** | accepted improvement (6.5% closure — under the 20% gate) | 2026-09-15 |
 
 ### Measured facts from the smoke run (2026-09-13, Kaggle, CPU fallback)
 
@@ -69,6 +70,7 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 | random-init ablation | 0.6039 | 0.595 | −0.009 |
 | baseline L0 (pretrained + cache) | 0.6339 | 0.641 | +0.007 |
 | **L1 (LLM labels)** | 0.7642 | **0.803** | **+0.039** |
+| L1 + p2 geometry | 0.7794 | **0.808** | +0.029 |
 
 The ordering holds — three for three — but **the offset is not constant**, and the third point breaks
 the ±0.01 band the first two suggested. Do not use "LB ≈ CV" as a predictor. A plausible reason: the
@@ -83,6 +85,24 @@ Note what the pair also says about pretraining: **+0.030 on CV, +0.046 on the LB
 scored on far more studies than 58. By our own 2σ rule the CV gain is "unprovable", yet the larger
 test set agrees with it. That is an argument about the instrument, not about pretraining — and it is
 the case for `exp-20260913-04`.
+
+**Finding — the screening metric predicts the leaderboard better than gold CV does.** For the p2
+geometry change, the three instruments said:
+
+| instrument | Δ |
+|---|---|
+| gold CV | +0.0154 |
+| **screening metric** | **+0.0082** |
+| **public LB** | **+0.005** |
+
+Gold overstated the gain by 3×; the screening metric landed within 0.003 of the leaderboard. This is
+the strongest argument yet for treating the screening metric as *the* instrument and gold as a
+sanity check — it is not merely tighter, it appears less biased.
+
+**Finding — the rerun is deterministic.** The exp-11 notebook was submitted **twice** (once by
+Vaibhav, once by Claude), each triggering an independent retrain of 3 seeds from scratch on Kaggle's
+hardware. Both scored **0.808** exactly. Same-accelerator determinism therefore holds end-to-end
+through a full retrain, not just within one session.
 
 **Finding — pairing is worth 4× the sample size, and costs nothing.** exp-11 vs the L1 baseline on
 the same 58 gold studies: the *marginal* gold bar is 0.1110, but a **paired** bootstrap over the same
