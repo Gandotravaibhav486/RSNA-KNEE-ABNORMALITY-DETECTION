@@ -1,0 +1,136 @@
+{
+  "experiment_id": "exp-27-ep20",
+  "run_mode": "full",
+  "date": "2026-09-16",
+  "labeller_version": "L1-llm-v4-blend",
+  "labeller_gold_auc": 0.6879,
+  "preproc_version": "p2",
+  "backbone": "resnet18",
+  "epochs": 20,
+  "seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "n_folds": 5,
+  "eval_repeats": 5,
+  "train_studies": 4349,
+  "train_gpu_seconds": 8016.5,
+  "per_seed_full_auc": [
+    0.7838,
+    0.7648,
+    0.7897
+  ],
+  "baseline_cv": 0.7794,
+  "seed_spread": 0.0106,
+  "fold_mean": 0.7787,
+  "sigma": 0.0469,
+  "significance_threshold_2sigma": 0.0938,
+  "dropped_cells": 0,
+  "total_cells": 900,
+  "ensemble_full_auc": 0.8316,
+  "per_target_auc": {
+    "ACL": 0.873,
+    "MCL": 0.769,
+    "Medial Meniscus": 0.859,
+    "Lateral Meniscus": 0.76,
+    "Medial OA": 0.912,
+    "Lateral OA": 0.783,
+    "PF OA": 0.826,
+    "Effusion": 0.927,
+    "Synovitis": 0.785,
+    "Baker's": 0.944,
+    "Contusion": 0.757,
+    "Fracture": 0.785
+  },
+  "per_label_vs_b1": {
+    "Effusion": {
+      "pos": 35,
+      "b1": 0.881,
+      "this run": 0.927,
+      "delta": 0.046,
+      "headroom": -0.05
+    },
+    "Medial Meniscus": {
+      "pos": 26,
+      "b1": 0.825,
+      "this run": 0.859,
+      "delta": 0.034,
+      "headroom": 0.089
+    },
+    "ACL": {
+      "pos": 24,
+      "b1": 0.841,
+      "this run": 0.873,
+      "delta": 0.032,
+      "headroom": 0.114
+    },
+    "PF OA": {
+      "pos": 21,
+      "b1": 0.815,
+      "this run": 0.826,
+      "delta": 0.011,
+      "headroom": 0.076
+    },
+    "Baker's": {
+      "pos": 12,
+      "b1": 0.937,
+      "this run": 0.944,
+      "delta": 0.007,
+      "headroom": 0.0
+    },
+    "Synovitis": {
+      "pos": 27,
+      "b1": 0.78,
+      "this run": 0.785,
+      "delta": 0.005,
+      "headroom": 0.005
+    },
+    "Fracture": {
+      "pos": 18,
+      "b1": 0.783,
+      "this run": 0.785,
+      "delta": 0.002,
+      "headroom": 0.008
+    },
+    "Lateral Meniscus": {
+      "pos": 23,
+      "b1": 0.781,
+      "this run": 0.76,
+      "delta": -0.021,
+      "headroom": 0.119
+    },
+    "Medial OA": {
+      "pos": 15,
+      "b1": 0.938,
+      "this run": 0.912,
+      "delta": -0.026,
+      "headroom": 0.02
+    },
+    "MCL": {
+      "pos": 9,
+      "b1": 0.796,
+      "this run": 0.769,
+      "delta": -0.027,
+      "headroom": 0.199
+    },
+    "Lateral OA": {
+      "pos": 11,
+      "b1": 0.81,
+      "this run": 0.783,
+      "delta": -0.027,
+      "headroom": 0.05
+    },
+    "Contusion": {
+      "pos": 19,
+      "b1": 0.796,
+      "this run": 0.757,
+      "delta": -0.039,
+      "headroom": 0.103
+    }
+  },
+  "infer_seconds_total": 6.9,
+  "infer_seconds_per_study": 2.3,
+  "studies_failed_to_0.5": 0,
+  "total_runtime_hours": 2.296
+}

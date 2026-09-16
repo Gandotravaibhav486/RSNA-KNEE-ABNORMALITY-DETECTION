@@ -112,6 +112,25 @@ tighter, for zero GPU. Every future comparison should be paired from saved predi
 argues about a marginal number. (It still was not enough here: Δ=+0.0154, CI [−0.0081, +0.0410],
 P(Δ>0)=0.89.)
 
+**Finding — the epoch curve is flat by 12. The schedule is done.**
+
+| epochs | gold, 3-seed ensemble |
+|---|---|
+| 4 | 0.7914 |
+| **12** | **0.8319** ← b1 |
+| 20 | 0.8316 |
+
+20 vs 12: **Δ −0.0003**, paired CI [−0.0270, +0.0245]. Identical. The 4→12 jump was +0.0405; the
+12→20 jump is nothing, for 1.7× the GPU. **12 epochs is the setting.**
+
+Per label, 20 epochs does *not* continue the focal trend that 12 started — ACL +0.032 and Medial
+Meniscus +0.034 keep rising, but **MCL falls back −0.027** and Lateral Meniscus −0.021, while the
+biggest single gain is Effusion +0.046, a diffuse finding already at its ceiling. The focal cluster
+nets +0.013, inside this run's own noise.
+
+**Remaining headroom is unchanged at 0.065 of macro**, still concentrated in MCL (0.199), Lateral
+Meniscus (0.119) and ACL (0.114). Training length is no longer the lever for it.
+
 **Finding — p3's geometry gain does not survive longer training.** The screening metric measured
 p3 at **+0.0179** over p2 at 4 epochs (CI [+0.0139, +0.0219], 12/12 targets). At 12 epochs on gold,
 the same geometry gives **0.8161 vs b1's 0.8319 — Δ −0.0158**, paired CI [−0.0437, +0.0110],
