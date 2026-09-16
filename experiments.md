@@ -111,6 +111,29 @@ tighter, for zero GPU. Every future comparison should be paired from saved predi
 argues about a marginal number. (It still was not enough here: Δ=+0.0154, CI [−0.0081, +0.0410],
 P(Δ>0)=0.89.)
 
+**Finding — the 0.936 is not "DINOv2", it is 20 of them.** Read from the public notebook's own code:
+
+| | public 0.936 branch | our exp-22 |
+|---|---|---|
+| models | **20 DINOv2-small, one per fold**, rank-averaged — then blended with a 5-model DINOv3 branch, a RadImageNet ResNet50 branch and a CoAtNet branch | 1 model, 3 folds |
+| resolution | **336** | 224 |
+| slot budget | **asymmetric**: `Sagittal-FS 18, Sagittal-nonFS 14, Coronal-FS 12, Coronal-nonFS 8, Axial 12` — 64 slices, **half of them sagittal** | uniform 6 slots × 3 windows = 18 |
+| weights | fine-tuned on this competition (`raptor_ft_*.pt`) | drop-in, resnet18's LR and schedule |
+| combination | rank averaging | probability averaging |
+
+Their own note is worth quoting for calibration: that branch *"shows signs of overfitting on the gold
+studies, so its score on the 58 gold cases"* understates it — the same gold-underestimates-LB effect
+we measured independently.
+
+**The asymmetric, sagittal-weighted slot budget is the finding we arrived at from the other
+direction.** Our per-label shortfall is concentrated in ACL, MCL and medial meniscus — focal
+structures read on sagittal — and our p2 geometry *reduced* sagittal window density from 4 to 3.
+They spend half of a 64-slice budget on sagittal. Two independent routes to the same experiment.
+
+**Finding — rank averaging beats probability averaging, for free.** Tested on our three stored
+exp-11 seeds, no GPU: single seed 0.7794, probability average 0.7914, **rank average 0.7935**
+(+0.0021). Small, and it costs nothing but a line of code at inference.
+
 **Finding — DINOv2's deficit is uniform, which is what a training failure looks like.** Per label,
 DINOv2 lost on **12 of 12** targets, by −0.069 to −0.151, with no structure:
 
