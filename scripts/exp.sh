@@ -123,7 +123,19 @@ cmd_status() {
 }
 
 cmd_queue() {
-  local id=$1 nb=$2 running
+  local id=$1 nb=$2 running dep
+  # AFTER="owner/slug" blocks until that kernel is COMPLETE. A run whose cache is still building
+  # will fail preflight on arrival — cheap, but it wastes a slot and confuses the log.
+  if [ -n "${AFTER:-}" ]; then
+    for _ in $(seq 1 240); do
+      dep=$("$KAGGLE" kernels status "$AFTER" 2>&1 | tr -d '\n')
+      case "$dep" in
+        *COMPLETE*) echo "$(date +%H:%M:%S) dependency ready: $AFTER"; break ;;
+        *ERROR*|*cancel*) echo "dependency FAILED: $AFTER — not launching $id" >&2; return 1 ;;
+      esac
+      sleep 60
+    done
+  fi
   for _ in $(seq 1 240); do
     running=$(cmd_status | grep -c RUNNING || true)
     if [ "$running" -lt 2 ]; then
