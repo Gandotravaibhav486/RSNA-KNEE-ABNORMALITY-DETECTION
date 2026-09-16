@@ -1,0 +1,113 @@
+<title>Kaggle Setup Prompt</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--ground:#F6F8F9;--surface:#FFFFFF;--ink:#12181C;--ink-soft:#4A565E;--rule:#DCE4E7;
+ --accent:#0E5F63;--accent-soft:#E2EFEF;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#0E1315;--surface:#161D20;
+ --ink:#E7EDEF;--ink-soft:#9AA8AE;--rule:#2A3438;--accent:#68C4C4;--accent-soft:#16302F}}
+:root[data-theme="dark"]{--ground:#0E1315;--surface:#161D20;--ink:#E7EDEF;--ink-soft:#9AA8AE;
+ --rule:#2A3438;--accent:#68C4C4;--accent-soft:#16302F}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:"Source Sans 3",system-ui,sans-serif;
+ font-size:17px;line-height:1.65;margin:0;padding:0 24px 80px}
+.wrap{max-width:760px;margin:0 auto}
+header{padding:56px 0 24px;border-bottom:2px solid var(--ink);display:flex;gap:20px;
+ align-items:flex-end;flex-wrap:wrap;justify-content:space-between}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+ color:var(--accent);margin:0 0 12px}
+h1{font-family:Spectral,Georgia,serif;font-weight:600;font-size:36px;line-height:1.15;margin:0;
+ text-wrap:balance}
+.sub{color:var(--ink-soft);margin:10px 0 0;max-width:52ch}
+button{font-family:"Source Sans 3",sans-serif;font-size:15px;font-weight:600;color:var(--surface);
+ background:var(--accent);border:0;border-radius:4px;padding:10px 18px;cursor:pointer}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.note{background:var(--accent-soft);padding:14px 18px;margin:28px 0;font-size:15.5px}
+.prompt{background:var(--surface);border:1px solid var(--rule);padding:8px 26px 24px;margin:26px 0}
+.prompt p{margin:16px 0}
+.prompt p strong{font-weight:600}
+code{font-family:var(--mono);font-size:.88em;background:var(--accent-soft);padding:1px 4px}
+ul{padding-left:20px}li{margin:7px 0}
+footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--rule);font-size:14px;
+ color:var(--ink-soft)}
+</style>
+<div class="wrap">
+<header>
+ <div>
+  <p class="eyebrow">Reusable · paste at competition start</p>
+  <h1>Kaggle setup prompt</h1>
+  <p class="sub">Eight steps that put the measurement and the guards in before the experiments, distilled from a full competition run.</p>
+ </div>
+ <button id="copy" type="button">Copy prompt</button>
+</header>
+
+<div class="note"><strong>The one step people skip is step 5.</strong> Measuring the noise floor of your own validation costs one afternoon and decides whether every later result is readable. In the run this came from, the first instrument had a two-sigma bar of 0.1110 AUC — wider than every change worth making — and the replacement brought it to 0.0044.</div>
+
+<div class="prompt">
+<p>You are setting up a disciplined experiment programme for a Kaggle competition. Work in this
+directory. Do the setup below in order, and do not train anything until step 4.</p>
+<p><strong>1. Establish the facts before any code.</strong>
+Read the competition&#x27;s Overview, Evaluation, Rules and Code Requirements pages and write
+<code>rules.md</code>: the exact metric and its formula, runtime and hardware limits, whether internet is
+disabled at rerun, what external data and pretrained weights are permitted, submission filename and
+format, every deadline, the daily submission cap, and any second prize track (efficiency, etc.).
+Mark anything you could not confirm as <code>[verify]</code> rather than assuming it. Also read the discussion
+board and the top public notebooks <em>now</em>, not later — record what other people have already measured,
+because some of your planned experiments will already have been answered.</p>
+<p><strong>2. Write the rules you will work under.</strong>
+<code>AGENTS.md</code>: no GPU spend without a written plan I approve (hypothesis, expected effect, cost, and
+the result that would kill it); every change lands as a notebook that is actually run; a fix budget
+per change type, after which you stop rather than keep debugging; verdicts of +1 / −1 / null /
+invalid, decided against a stated significance bar; and a promotion gate for what is allowed to
+become the new baseline.</p>
+<p><strong>3. Set up the bookkeeping.</strong>
+<code>experiments.md</code> — one row per experiment including the rejected and the abandoned, so nothing is
+proposed twice. <code>agent-log.md</code> — append-only, one line per action, with a column for where you are
+stuck; three stuck entries in a row means escalate to me. <code>handoff.md</code> — rewritten before the end
+of every session. Version axes for anything that changes results without changing the code path
+(preprocessing version, training version); two results are only comparable when their versions match.</p>
+<p><strong>4. Measure the baseline, and record it.</strong>
+Get a real cross-validation number and a real leaderboard number from a runnable pipeline, with the
+commit that produced them. Never compare against a baseline that was never measured.</p>
+<p><strong>5. Then measure the instrument — this is the step most people skip.</strong>
+Establish the noise floor of your validation before trusting any result from it: repeated folds,
+multiple seeds, and a <strong>paired</strong> bootstrap between two runs on the same samples. Pairing is typically
+worth several times the sample size and costs nothing if you save every run&#x27;s predictions to disk.
+If the trustworthy labels are few, build a larger proxy metric (out-of-fold agreement with weak or
+derived labels over the whole corpus) and validate it on a <strong>known answer</strong> — a comparison whose true
+direction you already know from the leaderboard. Report every change against whichever instrument can
+actually resolve an effect of that size, and say which one you used.</p>
+<p><strong>6. Put the guards in before the experiments, not after.</strong>
+- A preflight assertion that fails a run <em>before</em> the expensive step if its inputs are missing or
+  wrong. Every silent failure costs a full run; every guard costs a second.
+- A static lint over each notebook before it is submitted to run — local checks skip branches that
+  only execute on the real hardware, so undefined names hide there.
+- Save predictions after every fold or arm, never only at the end. Runs die after the expensive part.
+- Before any submission, verify the file is not a placeholder or fallback.</p>
+<p><strong>7. Learn the platform&#x27;s constraints empirically and write them down.</strong>
+Accelerator selection, concurrent session limits, quota, where inputs are actually mounted, when
+logs become visible, how caches are attached. Discover each once, record it, never rediscover it.</p>
+<p><strong>8. How to run experiments after that.</strong>
+Cheap screening runs to decide questions; expensive full runs only to convert a decided question into
+a submission. CPU-only work on CPU machines where no GPU quota applies. One isolated working
+directory and one compute job per experiment. State the kill criterion before starting, and when a
+result contradicts the mechanism you proposed, say so plainly — a gain through the wrong mechanism is
+a different finding from the one you were testing.</p>
+<p><strong>Throughout:</strong> report what happened, not what was hoped. A negative result that is cleanly measured
+is worth more than a positive one that is not. If you notice you are about to claim a gain that your
+own significance bar cannot support, say that instead.</p></div>
+
+<footer>Distilled from the RSNA Knee Abnormality Detection programme: 58 labelled studies out of 4,407, a baseline that moved 0.641 → 0.808 on the public leaderboard, and four silent failures that each cost a full run before the guards existed.</footer>
+</div>
+<script>
+const RAW = "You are setting up a disciplined experiment programme for a Kaggle competition. Work in this\ndirectory. Do the setup below in order, and do not train anything until step 4.\n\n**1. Establish the facts before any code.**\nRead the competition&#x27;s Overview, Evaluation, Rules and Code Requirements pages and write\n`rules.md`: the exact metric and its formula, runtime and hardware limits, whether internet is\ndisabled at rerun, what external data and pretrained weights are permitted, submission filename and\nformat, every deadline, the daily submission cap, and any second prize track (efficiency, etc.).\nMark anything you could not confirm as `[verify]` rather than assuming it. Also read the discussion\nboard and the top public notebooks *now*, not later \u2014 record what other people have already measured,\nbecause some of your planned experiments will already have been answered.\n\n**2. Write the rules you will work under.**\n`AGENTS.md`: no GPU spend without a written plan I approve (hypothesis, expected effect, cost, and\nthe result that would kill it); every change lands as a notebook that is actually run; a fix budget\nper change type, after which you stop rather than keep debugging; verdicts of +1 / \u22121 / null /\ninvalid, decided against a stated significance bar; and a promotion gate for what is allowed to\nbecome the new baseline.\n\n**3. Set up the bookkeeping.**\n`experiments.md` \u2014 one row per experiment including the rejected and the abandoned, so nothing is\nproposed twice. `agent-log.md` \u2014 append-only, one line per action, with a column for where you are\nstuck; three stuck entries in a row means escalate to me. `handoff.md` \u2014 rewritten before the end\nof every session. Version axes for anything that changes results without changing the code path\n(preprocessing version, training version); two results are only comparable when their versions match.\n\n**4. Measure the baseline, and record it.**\nGet a real cross-validation number and a real leaderboard number from a runnable pipeline, with the\ncommit that produced them. Never compare against a baseline that was never measured.\n\n**5. Then measure the instrument \u2014 this is the step most people skip.**\nEstablish the noise floor of your validation before trusting any result from it: repeated folds,\nmultiple seeds, and a **paired** bootstrap between two runs on the same samples. Pairing is typically\nworth several times the sample size and costs nothing if you save every run&#x27;s predictions to disk.\nIf the trustworthy labels are few, build a larger proxy metric (out-of-fold agreement with weak or\nderived labels over the whole corpus) and validate it on a **known answer** \u2014 a comparison whose true\ndirection you already know from the leaderboard. Report every change against whichever instrument can\nactually resolve an effect of that size, and say which one you used.\n\n**6. Put the guards in before the experiments, not after.**\n- A preflight assertion that fails a run *before* the expensive step if its inputs are missing or\n  wrong. Every silent failure costs a full run; every guard costs a second.\n- A static lint over each notebook before it is submitted to run \u2014 local checks skip branches that\n  only execute on the real hardware, so undefined names hide there.\n- Save predictions after every fold or arm, never only at the end. Runs die after the expensive part.\n- Before any submission, verify the file is not a placeholder or fallback.\n\n**7. Learn the platform&#x27;s constraints empirically and write them down.**\nAccelerator selection, concurrent session limits, quota, where inputs are actually mounted, when\nlogs become visible, how caches are attached. Discover each once, record it, never rediscover it.\n\n**8. How to run experiments after that.**\nCheap screening runs to decide questions; expensive full runs only to convert a decided question into\na submission. CPU-only work on CPU machines where no GPU quota applies. One isolated working\ndirectory and one compute job per experiment. State the kill criterion before starting, and when a\nresult contradicts the mechanism you proposed, say so plainly \u2014 a gain through the wrong mechanism is\na different finding from the one you were testing.\n\n**Throughout:** report what happened, not what was hoped. A negative result that is cleanly measured\nis worth more than a positive one that is not. If you notice you are about to claim a gain that your\nown significance bar cannot support, say that instead.";
+document.getElementById("copy").addEventListener("click", async (e) => {
+  const btn = e.currentTarget;
+  try {
+    await navigator.clipboard.writeText(RAW.replace(/&quot;/g,'"').replace(/&#x27;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&"));
+    btn.textContent = "Copied";
+  } catch (err) {
+    btn.textContent = "Press Ctrl+C";
+  }
+  setTimeout(() => { btn.textContent = "Copy prompt"; }, 1800);
+});
+</script>
