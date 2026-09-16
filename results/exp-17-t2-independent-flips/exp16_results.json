@@ -1,0 +1,8 @@
+{
+  "experiment_id": "exp-17-t2-independent-flips",
+  "screen_auc_p2_t2": 0.7477,
+  "screen_auc_p2_t1_ref": 0.7501,
+  "train_version": "t2-independent-flips",
+  "n": 3406,
+  "date": "2026-09-15"
+}

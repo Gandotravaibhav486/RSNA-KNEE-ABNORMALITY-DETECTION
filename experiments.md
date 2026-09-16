@@ -191,6 +191,18 @@ exp-04 *is* the paired pretrained-vs-random comparison, run properly out-of-fold
 **Parallel batch that can start today:** exp-08's label build (CPU), exp-06 (CPU), and exp-10 (GPU)
 are mutually independent. exp-04 is already running and gates the reading of exp-10.
 
+**On adopting `t2` despite a null result.** exp-17 measured −0.0024 against a paired bar of 0.0032 —
+inside the noise, leaning slightly negative (P(Δ>0)=0.07). It is adopted anyway, because it is a
+**correctness fix**, not a performance claim: the two DataLoader workers were replaying an identical
+flip sequence, so the augmentation was half as diverse as intended. Adopting a bug fix does not
+require clearing a significance bar; *claiming a gain from it* would.
+
+**A limit of the paired bootstrap, worth stating.** Changing the flip stream is, statistically, much
+like changing a seed. The paired bootstrap resamples **studies**, so it captures study-sampling noise
+but **not** training-run noise. Seed spread on gold was ±0.0054–0.0066, comfortably larger than this
+Δ. Separating "t2 effect" from "different random draw" would need several seeds per arm, which is not
+worth the GPU for a fix we would keep regardless.
+
 **Version axes.** `PREPROC_VERSION` (`p1`/`p2`) keys the tensor cache. `TRAIN_VERSION` (`t1`/`t2`)
 keys the training stream — introduced 2026-09-16 because the augmentation fix changes results
 without changing a single cached tensor. A `p2/t2` result is not comparable to a `p2/t1` result, and
