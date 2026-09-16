@@ -361,6 +361,10 @@ the pair says so at a glance. Everything before exp-17 is implicitly `t1`.
 
 ## Ledger
 
+> `exp-25-p4-uniform22` is **held**: its premise (p3's +0.0179 at 4 epochs) did not survive at
+> 12 epochs, so a 4-epoch control would repeat the error it exists to resolve.
+
+
 | exp-id | date | type | change | hypothesis | baseline CV | new CV | Δ | public LB | lead ±1 | status |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `exp-20260913-01-baseline-v1` | 2026-09-13 | paper | Build the baseline notebook | yardstick + 2σ bar | — | — | — | — | n/a | done |
