@@ -111,6 +111,19 @@ tighter, for zero GPU. Every future comparison should be paired from saved predi
 argues about a marginal number. (It still was not enough here: Δ=+0.0154, CI [−0.0081, +0.0410],
 P(Δ>0)=0.89.)
 
+**Finding — the schedule question was never about the schedule; it was about the labels.** The same
+sweep, three times, on three instruments:
+
+| labels | instrument | 4 epochs | 12 epochs | verdict |
+|---|---|---|---|---|
+| L0 regex | gold | 0.6333 | 0.5998 | **worse**, monotone |
+| L1 LLM | gold | 0.7699 | 0.7792 | unresolvable (bar 0.1110) |
+| L1 LLM | **screening** | 0.7477 | **0.7550** | **+0.0073**, CI [+0.0027, +0.0118] → **+1** |
+
+With noisy labels more epochs fit the noise; with clean labels they fit the signal; and only the
+third instrument could tell which. Cost: 3× the training GPU for +0.0073 — worth it at 0.7 GPU h per
+run, and the trade to re-examine if training ever becomes the budget.
+
 **Finding — the epoch decline was a label-noise artefact, and it vanished with clean labels.**
 
 | epochs | L0 regex labels | L1 LLM labels |
@@ -244,7 +257,7 @@ the pair says so at a glance. Everything before exp-17 is implicitly `t1`.
 | `exp-20260914-08b-llm-model` | 2026-09-14 | data-analysis | Train on the public LLM key instead of the regex — everything else identical | label quality was the binding constraint | 0.6339 | **0.7642** | **+0.1303** | **0.803** | **+1** | done → **L1** |
 | `exp-20260914-09-silence-per-finding` | 2026-09-16 | loss | Silence ⇒ negative for Baker's / Medial OA | **Moot on our key**: `v4_blend` has **0.1%** of cells at exactly 0.5 (v2 has 19.2%), and Baker's has 0.2% in the uncertain band. The blend already resolved them | 0.7794 | — | — | — | — | **rejected unrun — measured** |
 | `exp-20260916-18-confidence-weight` | 2026-09-16 | loss | Weight each cell by `2·\|p−0.5\|` | the key is soft; plain BCE fits a 0.51 as hard as a 0.99 | 0.7477 | **0.7420** | **−0.0057**, paired 2σ 0.0029, CI [−0.0083, −0.0029], P(Δ>0)=0.000 | — | **−1** | done |
-| `exp-20260915-15-epochs-screened` | 2026-09-16 | training | 12 epochs vs 4 at p2/t2, screened | gold could not resolve exp-13 | 0.7477 | — | — | — | — | running |
+| `exp-20260915-15-epochs-screened` | 2026-09-16 | training | 12 epochs vs 4 at p2/t2, screened | gold could not resolve exp-13 | 0.7477 | **0.7550** | **+0.0073**, paired 2σ 0.0049, CI [+0.0027, +0.0118], P=0.998 | — | **+1** | done |
 | `exp-20260916-20-blend-keys` | 2026-09-16 | data-analysis | Blend `v4_blend` with `pilkwang` (0.8658, rank corr **0.891**) | best blend 0.8931 vs 0.8927 alone — **+0.0004, noise at n=58**. Too correlated to help | 0.8927 | 0.8931 | +0.0004 | — | **−1** | done, 0 GPU |
 | `exp-20260914-10-epochs` | 2026-09-14 | training | Epoch sweep 4/8/12 on L0 | is the model undertrained? | 0.6333 | 0.6127 / 0.5998 | monotone **down** | — | **−1** | done |
 | [`exp-20260914-12-own-llm-labels`](experiments/exp-20260914-12-own-llm-labels.md) | 2026-09-15 | data-analysis | Own LLM key, Qwen2.5-7B + published prompt | auditability + decorrelation | 0.8927 (key to beat) | 0.7125 gold-test | — | — | **−1** | done (2 kill criteria) |
