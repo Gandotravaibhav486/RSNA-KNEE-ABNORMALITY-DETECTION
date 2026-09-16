@@ -1,0 +1,8 @@
+{
+  "experiment_id": "exp-18-confidence-weight",
+  "screen_auc": 0.742,
+  "ref_p2_t2_unweighted": 0.7477,
+  "train_version": "t2-independent-flips",
+  "n": 3406,
+  "date": "2026-09-16"
+}
