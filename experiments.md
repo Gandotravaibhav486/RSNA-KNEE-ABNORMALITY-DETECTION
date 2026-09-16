@@ -111,6 +111,37 @@ tighter, for zero GPU. Every future comparison should be paired from saved predi
 argues about a marginal number. (It still was not enough here: Δ=+0.0154, CI [−0.0081, +0.0410],
 P(Δ>0)=0.89.)
 
+**Finding — longer training buys FOCAL findings specifically.** exp-23 (12 epochs, LB **0.824**)
+against exp-11 (4 epochs, LB 0.808), per label on gold:
+
+| gained | Δ | lost | Δ |
+|---|---|---|---|
+| ACL | **+0.110** | Effusion | −0.035 |
+| MCL | **+0.098** | Synovitis | −0.011 |
+| Medial Meniscus | **+0.093** | Contusion | −0.003 |
+| Baker's | +0.092 | PF OA | −0.001 |
+
+The gains land on the ligaments and medial meniscus — small, focal structures — and the small losses
+on the diffuse findings we were already strongest at. This is the mechanism the p3 geometry
+experiment was *aiming* at and missed: epochs, not window distribution, are what bought resolution
+on focal structures.
+
+**Where the remaining headroom is, after exp-23.** Against our own label ceiling:
+
+| target | now | ceiling | headroom |
+|---|---|---|---|
+| **MCL** | 0.796 | 0.968 | **0.172** |
+| **ACL** | 0.841 | 0.987 | **0.146** |
+| **Medial Meniscus** | 0.825 | 0.948 | **0.124** |
+| Lateral Meniscus | 0.781 | 0.879 | 0.098 |
+| PF OA | 0.815 | 0.902 | 0.087 |
+| Effusion | 0.881 | 0.877 | **exhausted** |
+| Medial OA | 0.938 | 0.932 | **exhausted** |
+
+Total positive headroom **0.739 across 12 targets = 0.062 of macro AUC**, and the top three hold
+**60%** of it. Effusion and Medial OA now *exceed* the label key, so for those two the **key**, not the
+model, is the binding constraint. → exp-27 tests 20 epochs.
+
 **Finding — the gap is NOT ensembling. A single model of theirs beats our ensemble by 0.13.**
 exp-21 ran the public notebook's CoAtNet branch against our own 58 gold studies:
 
