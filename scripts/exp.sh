@@ -8,6 +8,7 @@
 #   ./scripts/exp.sh fetch  <exp-id>            # pull log + results json into results/
 #   ./scripts/exp.sh status                     # every experiment kernel, one line each
 #   ./scripts/exp.sh queue  <exp-id> <nb>       # wait for a free GPU slot, then push
+#   ./scripts/exp.sh qrun   <exp-id> '<json>'   # wait for a slot, then run with overrides
 #
 # Kaggle allows at most 2 concurrent batch GPU sessions (measured 2026-09-14: a third push is
 # refused with "Maximum batch GPU session count of 2 reached"). CPU pushes are not subject to it.
@@ -174,9 +175,23 @@ cmd_queue() {
   echo "no GPU slot freed within 4 h"; return 1
 }
 
+cmd_qrun() {
+  local id=$1 json=${2:-'{}'} running
+  for _ in $(seq 1 240); do
+    running=$(cmd_status | grep -c RUNNING || true)
+    if [ "$running" -lt 2 ]; then
+      echo "$(date +%H:%M:%S) slot free ($running running) — running $id"
+      cmd_run "$id" "$json" && return 0
+    fi
+    sleep 60
+  done
+  echo "no GPU slot freed within 4 h"; return 1
+}
+
 case "${1:-}" in
   new)    cmd_new "$2" ;;
   run)    cmd_run "$2" "${3:-{\}}" ;;
+  qrun)   cmd_qrun "$2" "${3:-{\}}" ;;
   queue)  cmd_queue "$2" "$3" ;;
   push)   cmd_push "$2" "$3" "${4:-gpu}" ;;
   watch)  cmd_watch "$2" ;;
