@@ -1,0 +1,167 @@
+<title>RSNA Knee Experiment Protocol</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F6F8F9; --surface:#FFFFFF; --ink:#12181C; --ink-soft:#4A565E;
+  --rule:#DCE4E7; --rule-soft:#EAF0F2;
+  --accent:#0E5F63; --accent-soft:#E2EFEF;
+  --pos:#2D6A45; --neg:#9E3B30; --neutral:#7A6A2E;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0E1315; --surface:#161D20; --ink:#E7EDEF; --ink-soft:#9AA8AE;
+  --rule:#2A3438; --rule-soft:#1E272A;
+  --accent:#68C4C4; --accent-soft:#16302F;
+  --pos:#7FC08F; --neg:#E38A7E; --neutral:#D6BC6A;
+}}
+:root[data-theme="dark"]{
+  --ground:#0E1315; --surface:#161D20; --ink:#E7EDEF; --ink-soft:#9AA8AE;
+  --rule:#2A3438; --rule-soft:#1E272A;
+  --accent:#68C4C4; --accent-soft:#16302F;
+  --pos:#7FC08F; --neg:#E38A7E; --neutral:#D6BC6A;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:"Source Sans 3",system-ui,sans-serif;
+  font-size:17px;line-height:1.65;margin:0;padding:0 24px 96px}
+.wrap{max-width:760px;margin:0 auto}
+header{padding:64px 0 28px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 14px}
+h1{font-family:Spectral,Georgia,serif;font-weight:600;font-size:40px;line-height:1.12;margin:0;
+  text-wrap:balance;letter-spacing:-.01em}
+.standfirst{font-family:Spectral,Georgia,serif;font-size:20px;line-height:1.5;color:var(--ink-soft);
+  margin:16px 0 0;font-style:italic}
+h2{font-family:Spectral,Georgia,serif;font-weight:600;font-size:26px;line-height:1.25;
+  margin:56px 0 4px;text-wrap:balance}
+h3{font-family:"Source Sans 3",sans-serif;font-weight:600;font-size:16px;margin:32px 0 6px;
+  letter-spacing:.01em}
+p{margin:14px 0}
+a{color:var(--accent)}
+.lede{color:var(--ink-soft)}
+code,.m{font-family:var(--mono);font-size:.88em}
+.fig{display:flex;flex-wrap:wrap;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  margin:26px 0}
+.fig div{background:var(--surface);padding:16px 18px;flex:1 1 150px}
+.fig .k{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-soft);margin:0 0 6px}
+.fig .v{font-family:var(--mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;margin:0}
+.scroll{overflow-x:auto;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:9px 14px 9px 0;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+th{font-family:"Source Sans 3",sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-soft);border-bottom:1px solid var(--rule)}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:26px 0}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:16px;
+  padding:14px 0;border-top:1px solid var(--rule-soft)}
+ol.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:12px;
+  color:var(--accent);padding-top:3px}
+ol.steps b{font-weight:600}
+ol.steps span{display:block;color:var(--ink-soft);font-size:15px}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 7px;border:1px solid currentColor;
+  white-space:nowrap}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .neu{color:var(--neutral)}
+blockquote{margin:26px 0;padding:2px 0 2px 20px;border-left:3px solid var(--accent);
+  font-family:Spectral,Georgia,serif;font-size:19px;line-height:1.5}
+.note{background:var(--accent-soft);padding:16px 18px;margin:26px 0;font-size:15.5px}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--rule);font-size:14px;color:var(--ink-soft)}
+ul{padding-left:20px} li{margin:6px 0}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Method note · RSNA Knee Abnormality Detection</p>
+  <h1>Running experiments when you only have 58 labels</h1>
+  <p class="standfirst">How this pipeline is built, measured, and judged — and why the measuring instrument turned out to matter more than the model.</p>
+</header>
+
+<h2>The constraint everything follows from</h2>
+<p>The competition ships 4,407 knee MRI studies with twelve findings each. <b>58 of them carry real radiologist annotations.</b> The other 4,349 carry a free-text report and nothing else — and reports exist for 100% of train and 0% of test, so text can only ever manufacture targets, never feed the model.</p>
+<p class="lede">Two consequences shape every decision below. Almost everyone is training against labels they invented, so label quality is a ceiling no encoder can pass. And 58 studies is a very short ruler: on it, the two-sigma bar for calling a change real is <span class="m">0.1110</span> AUC — wider than most changes worth making.</p>
+
+<div class="fig">
+  <div><p class="k">Studies</p><p class="v">4,407</p></div>
+  <div><p class="k">Annotated</p><p class="v">58</p></div>
+  <div><p class="k">Targets</p><p class="v">12</p></div>
+  <div><p class="k">Metric</p><p class="v">macro AUC</p></div>
+</div>
+
+<h2>Three instruments, and what each is for</h2>
+<p>We never report one number. Every change is read against whichever instrument can actually resolve it, and the gold set is reserved as a confirmation surface rather than a search surface.</p>
+<div class="scroll">
+<table>
+<thead><tr><th>Instrument</th><th>n</th><th>2σ bar</th><th>Cost</th><th>Role</th></tr></thead>
+<tbody>
+<tr><td>Gold set</td><td class="n">58</td><td class="n">0.1110</td><td>free</td><td>Truth. Too blunt to search with.</td></tr>
+<tr><td>Gold, <b>paired</b></td><td class="n">58</td><td class="n">0.0254</td><td>free</td><td>Same studies, both models, resampled together.</td></tr>
+<tr><td><b>Screening metric</b></td><td class="n">3,406</td><td class="n">0.0044</td><td>0.22 GPU h</td><td>Out-of-fold agreement with the label key. Ranks variants.</td></tr>
+<tr><td>Public leaderboard</td><td class="n">hidden</td><td class="n">—</td><td>1/day</td><td>The only unbiased read. Rationed.</td></tr>
+</tbody>
+</table>
+</div>
+<blockquote>Pairing is worth roughly four times the sample size and costs nothing — it only requires keeping every run's predictions on disk.</blockquote>
+<p>The screening metric earned its place by prediction, not by being tighter. For the geometry change, gold said <span class="m">+0.0154</span>, screening said <span class="m">+0.0082</span>, and the leaderboard delivered <span class="m">+0.005</span>. Gold overstated by 3×; screening landed within 0.003. It is not merely narrower — it appears less biased.</p>
+<div class="note"><b>What the screening metric is not.</b> It measures agreement with model-generated labels whose pooled false-positive rate we measured at 0.66. Its absolute value is never quoted as a score, and it is blind to any improvement on findings the reports never mention.</div>
+
+<h2>How an experiment is created</h2>
+<p>This is a genuine sequence — each step gates the next, and the expensive step sits deliberately late.</p>
+<ol class="steps">
+<li><b>Intake</b><span>A proposal must name its mechanism and its kill criterion before anything is built. Competition discussions and top public notebooks are read first; several of our experiments were killed or reframed by someone else's published measurement.</span></li>
+<li><b>Plan, if it costs GPU</b><span>Hypothesis, expected delta, GPU hours, and what result would end it — written down and approved before the first epoch. Anything answerable by arithmetic is answered by arithmetic instead.</span></li>
+<li><b>Build as a notebook variant</b><span>Generated from the current baseline by explicit patch, so the only difference from the control is the thing under test. Versioned on two axes: <span class="m">p1/p2</span> keys the tensor cache, <span class="m">t1/t2</span> keys the training stream.</span></li>
+<li><b>Static lint</b><span>pyflakes across the whole notebook before it is allowed near a GPU. Local runs skip every image-dependent branch, so undefined names hide there until they cost an hour.</span></li>
+<li><b>Preflight, in code</b><span>The run raises before epoch one if the weights or the cache did not mount. The kill criterion lives in the notebook, not in a document — the document version cost 1.26 GPU hours of training from random initialisation.</span></li>
+<li><b>Run, isolated</b><span>One Kaggle kernel per experiment, two GPU sessions concurrently, CPU work pushed to CPU kernels where no quota applies.</span></li>
+<li><b>Score paired, offline</b><span>Every run saves its predictions. The comparison against the control is a paired bootstrap computed locally at zero cost — which is how a result that gold called unresolved became a confirmed <span class="chip pos">+1</span>.</span></li>
+<li><b>Verdict and ledger</b><span>One row, including the rejected and the absorbed, so no idea is proposed twice.</span></li>
+</ol>
+
+<h3>Verdicts</h3>
+<p><span class="chip pos">+1</span> clears 2σ on the instrument that can see it — pursue, and design follow-ups on the same mechanism. <span class="chip neg">−1</span> is inside the noise or worse — stop, and record why. <span class="chip neu">null</span> is no measurable effect; a correctness fix is adopted anyway, but no gain is claimed from it. A run that broke a precondition is <b>invalid</b> and counts as evidence for nothing.</p>
+<p>The baseline itself only moves on a separate gate: a 20% closure of the error gap, or a genuinely new approach family, which gets its own lineage rather than replacing the old one.</p>
+
+<h2>What the programme has produced</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>Change</th><th>Gold CV</th><th>Public LB</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Baseline — regex labels, resnet18, 12 windows @192</td><td class="n">0.6339</td><td class="n">0.641</td><td>lineage L0</td></tr>
+<tr><td><b>Public LLM label key</b> replaces the regex</td><td class="n">0.7642</td><td class="n">0.803</td><td><span class="chip pos">+1</span> → L1</td></tr>
+<tr><td><b>Geometry</b>: 18 windows @224, six slots</td><td class="n">0.7794</td><td class="n">0.808</td><td><span class="chip pos">+1</span></td></tr>
+<tr><td>Longer schedules (4 → 12 epochs)</td><td class="n">0.5998</td><td class="n">—</td><td><span class="chip neg">−1</span></td></tr>
+<tr><td>Our own LLM label key</td><td class="n">0.7125</td><td class="n">—</td><td><span class="chip neg">−1</span></td></tr>
+<tr><td>Independent augmentation streams</td><td class="n">0.7477</td><td class="n">—</td><td><span class="chip neu">null</span>, adopted</td></tr>
+</tbody>
+</table>
+</div>
+<p>One change did almost all the work. Swapping our keyword labeller (0.6879 against gold) for a public LLM-derived key (0.8927) moved the leaderboard <span class="m">+0.162</span> with the model, folds, seeds, cache and schedule all held fixed.</p>
+
+<h3>Where the model still lags its own labels</h3>
+<p>The remaining shortfall is concentrated, not diffuse. Against the label ceiling on the same 58 studies, three targets carry 0.74 of the total 1.01 gap:</p>
+<div class="scroll">
+<table>
+<thead><tr><th>Target</th><th>Positives</th><th>Label key</th><th>Model</th><th>Captured</th></tr></thead>
+<tbody>
+<tr><td>MCL</td><td class="n">9</td><td class="n">0.968</td><td class="n">0.698</td><td class="n">42%</td></tr>
+<tr><td>ACL</td><td class="n">24</td><td class="n">0.987</td><td class="n">0.730</td><td class="n">47%</td></tr>
+<tr><td>Medial meniscus</td><td class="n">26</td><td class="n">0.948</td><td class="n">0.732</td><td class="n">52%</td></tr>
+<tr><td>Effusion</td><td class="n">35</td><td class="n">0.877</td><td class="n">0.916</td><td class="n">110%</td></tr>
+</tbody>
+</table>
+</div>
+<p>Ligaments and menisci are small, focal, and visible in a handful of slices in one plane; effusion and osteoarthritis are diffuse and visible almost anywhere in the volume. We sample three windows per slot — thin coverage exactly where a meniscal tear lives. That is a testable geometry hypothesis, not a shrug.</p>
+
+<h2>Failure modes, all paid for once</h2>
+<p>Every failure in this programme so far has died <i>after</i> the expensive part, never before it, and none of them raised an error. They produced plausible numbers from wrong inputs.</p>
+<ul>
+<li><b>Silent fallback to random initialisation.</b> Attachments did not mount; training ran an hour and logged a believable score. Now a preflight assertion.</li>
+<li><b>A missing import after six folds of training.</b> Saved predictions meant the analysis was redone locally for free. Now a pre-push lint.</li>
+<li><b>Stale artifacts.</b> The Kaggle client skips files that already exist locally, so a re-fetch served a previous version's predictions — producing an estimate twelve times too large, caught only because it was implausible.</li>
+<li><b>Silent no-op edits.</b> String replacements against anchors that had already changed dropped ten of twenty-two rows from the ledger. Edits now assert that the anchor existed.</li>
+</ul>
+<div class="note"><b>The through-line.</b> Cheap guards at the front — a lint, an assertion, a saved prediction file — are worth more than careful reading at the back. Every one of these was invisible to an execution-based check and obvious to a static one.</div>
+
+<footer>
+Method note for the RSNA Knee Abnormality Detection challenge. All figures are measured runs from this programme: gold CV on the 58 annotated studies, screening metric on 3,406 report-labelled studies, public leaderboard as submitted. Label keys are public and CC0; LLM-derived labelling is explicitly permitted by the competition host.
+</footer>
+</div>
