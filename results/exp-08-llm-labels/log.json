@@ -1,0 +1,200 @@
+[{"stream_name":"stderr","time":6.431168697,"data":"/usr/local/lib/python3.12/dist-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.\n"}
+,{"stream_name":"stderr","time":6.431240047,"data":"  validate(nb)\n"}
+,{"stream_name":"stderr","time":7.332069606,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":7.332102716,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":7.332109744,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":7.332116996,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":7.981006033,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":7.981041538,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":7.981046918,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":7.981050773,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":736.721402703,"data":"run mode   : full   seeds=[2026, 2027, 2028]   epochs=4\n"}
+,{"stream_name":"stdout","time":736.721491823,"data":"data root  : /kaggle/input/rsna-knee-abnormality-detection\n"}
+,{"stream_name":"stdout","time":736.721500017,"data":"work dir   : /kaggle/working\n"}
+,{"stream_name":"stdout","time":736.721505376,"data":"cache      : cache_p1  (preproc p1, labeller v1-keyword)\n"}
+,{"stream_name":"stdout","time":736.721510332,"data":"per study  : 12 windows (3 slots x 4 triplets) at 192x192\n"}
+,{"stream_name":"stdout","time":736.807441354,"data":"fallback submission written to: /kaggle/working/submission.csv\n"}
+,{"stream_name":"stdout","time":736.807471701,"data":"test rows visible here: 3  (the hidden test set is substituted at rerun)\n"}
+,{"stream_name":"stdout","time":737.209187528,"data":"gold studies: 58   report-only: 4349\n"}
+,{"stream_name":"stdout","time":737.20923999,"data":"\n"}
+,{"stream_name":"stdout","time":737.209247674,"data":"positives per target among the gold studies:\n"}
+,{"stream_name":"stdout","time":737.20925363,"data":"ACL                 24\n"}
+,{"stream_name":"stdout","time":737.209259502,"data":"MCL                  9\n"}
+,{"stream_name":"stdout","time":737.209264305,"data":"Medial Meniscus     26\n"}
+,{"stream_name":"stdout","time":737.20926901,"data":"Lateral Meniscus    23\n"}
+,{"stream_name":"stdout","time":737.209273723,"data":"Medial OA           15\n"}
+,{"stream_name":"stdout","time":737.2092784,"data":"Lateral OA          11\n"}
+,{"stream_name":"stdout","time":737.209288974,"data":"PF OA               21\n"}
+,{"stream_name":"stdout","time":737.209292999,"data":"Effusion            35\n"}
+,{"stream_name":"stdout","time":737.2092962,"data":"Synovitis           27\n"}
+,{"stream_name":"stdout","time":737.209299335,"data":"Baker's             12\n"}
+,{"stream_name":"stdout","time":737.209302437,"data":"Contusion           19\n"}
+,{"stream_name":"stdout","time":737.209305821,"data":"Fracture            18\n"}
+,{"stream_name":"stdout","time":737.209308945,"data":"\n"}
+,{"stream_name":"stdout","time":737.209312063,"data":"rarest target: MCL with 9 positives -\u003e 1.8 expected positives per fold. This is why undefined (fold, label) cells are unavoidable and must be counted.\n"}
+,{"stream_name":"stdout","time":739.308951386,"data":"label coverage (share of studies the report can decide):\n"}
+,{"stream_name":"stdout","time":739.308986362,"data":"ACL                 31.5\n"}
+,{"stream_name":"stdout","time":739.308989996,"data":"MCL                 22.1\n"}
+,{"stream_name":"stdout","time":739.308992508,"data":"Medial Meniscus     36.5\n"}
+,{"stream_name":"stdout","time":739.309009677,"data":"Lateral Meniscus    35.1\n"}
+,{"stream_name":"stdout","time":739.309014014,"data":"Medial OA           16.3\n"}
+,{"stream_name":"stdout","time":739.309018243,"data":"Lateral OA          11.9\n"}
+,{"stream_name":"stdout","time":739.30902249,"data":"PF OA               22.9\n"}
+,{"stream_name":"stdout","time":739.309026596,"data":"Effusion            63.6\n"}
+,{"stream_name":"stdout","time":739.309030201,"data":"Synovitis           12.0\n"}
+,{"stream_name":"stdout","time":739.309033833,"data":"Baker's             33.2\n"}
+,{"stream_name":"stdout","time":739.309037345,"data":"Contusion           24.1\n"}
+,{"stream_name":"stdout","time":739.309040902,"data":"Fracture            18.8\n"}
+,{"stream_name":"stdout","time":739.329304754,"data":"labeller contract: 11/11 assertions pass\n"}
+,{"stream_name":"stdout","time":739.3294463,"data":"known v1 gaps (Spanish 'condropatia' / 'cartilago' unmatched): still present, as expected\n"}
+,{"stream_name":"stdout","time":741.148538379,"data":"          target  gold pos  coverage   AUC\n"}
+,{"stream_name":"stdout","time":741.148561712,"data":"             ACL        24     0.534 0.724\n"}
+,{"stream_name":"stdout","time":741.148566923,"data":"             MCL         9     0.328 0.694\n"}
+,{"stream_name":"stdout","time":741.148571362,"data":" Medial Meniscus        26     0.448 0.633\n"}
+,{"stream_name":"stdout","time":741.148575699,"data":"Lateral Meniscus        23     0.448 0.699\n"}
+,{"stream_name":"stdout","time":741.148579976,"data":"       Medial OA        15     0.155 0.755\n"}
+,{"stream_name":"stdout","time":741.148584369,"data":"      Lateral OA        11     0.121 0.650\n"}
+,{"stream_name":"stdout","time":741.148588785,"data":"           PF OA        21     0.138 0.566\n"}
+,{"stream_name":"stdout","time":741.148593041,"data":"        Effusion        35     0.759 0.640\n"}
+,{"stream_name":"stdout","time":741.148597316,"data":"       Synovitis        27     0.276 0.658\n"}
+,{"stream_name":"stdout","time":741.148601654,"data":"         Baker's        12     0.310 0.797\n"}
+,{"stream_name":"stdout","time":741.148606013,"data":"       Contusion        19     0.431 0.665\n"}
+,{"stream_name":"stdout","time":741.148610363,"data":"        Fracture        18     0.328 0.774\n"}
+,{"stream_name":"stdout","time":741.148614665,"data":"\n"}
+,{"stream_name":"stdout","time":741.148618715,"data":"v1-keyword macro AUC on gold: 0.6879   \u003c- record this in experiments.md\n"}
+,{"stream_name":"stdout","time":943.405610235,"data":"L1 labels loaded from /kaggle/input/rsna-knee-llm-report-labels/llm_labels_v4_blend.csv\n"}
+,{"stream_name":"stdout","time":943.405668205,"data":"  rows 4407, cells at exactly 0.5: 0.1%\n"}
+,{"stream_name":"stdout","time":943.405675979,"data":"  regex control coverage was 27.3% of cells decided\n"}
+,{"stream_name":"stdout","time":943.405681505,"data":"  L1 macro AUC on the 58 gold studies: 0.8927  (regex: 0.6879)\n"}
+,{"stream_name":"stdout","time":944.461062028,"data":"evaluation protocol: all assertions pass (fold sizes [12, 12, 11, 11, 12], dropped 8.3% in the degenerate case)\n"}
+,{"stream_name":"stdout","time":944.46112988,"data":"[budget] after tests: 0.06 h of 6.75 h used (1% of the Kaggle cap)\n"}
+,{"stream_name":"stdout","time":945.634424807,"data":"image directories present: True\n"}
+,{"stream_name":"stdout","time":962.525262362,"data":"device: cuda | Tesla T4\n"}
+,{"stream_name":"stdout","time":963.371089153,"data":"backbone weights: /kaggle/input/timm-backbones-offline/resnet18.a1_in1k.bin (offline, 122 tensors, 0 missing)\n"}
+,{"stream_name":"stdout","time":963.741103814,"data":"model + loss contracts: all assertions pass (backbone pretrained=True)\n"}
+,{"stream_name":"stdout","time":963.74113619,"data":"offline weights: resnet18.a1_in1k.bin loads cleanly (122 tensors, only the classifier discarded)\n"}
+,{"stream_name":"stdout","time":963.782286529,"data":"weakly-labelled studies available : 4349\n"}
+,{"stream_name":"stdout","time":963.782316424,"data":"known label cells among them      : 100.0%\n"}
+,{"stream_name":"stdout","time":963.782322771,"data":"using this run                    : 4349\n"}
+,{"stream_name":"stdout","time":963.782327515,"data":"measuring on                      : 58 gold studies (never trained on)\n"}
+,{"stream_name":"stdout","time":963.98221692,"data":"attached inputs: ['rsna-knee-abnormality-detection', 'rsna-knee-cache-build-p1', 'rsna-knee-llm-report-labels', 'timm-backbones-offline']\n"}
+,{"stream_name":"stdout","time":963.982294604,"data":"  weights found : /kaggle/input/timm-backbones-offline/resnet18.a1_in1k.bin\n"}
+,{"stream_name":"stdout","time":963.982303067,"data":"  cache dirs    : ['/kaggle/input/rsna-knee-cache-build-p1/cache_p1', '/kaggle/input/rsna-knee-cache-build-p1', '/kaggle/working/cache_p1']\n"}
+,{"stream_name":"stdout","time":963.982315595,"data":"preflight: weights and cache both attached\n"}
+,{"stream_name":"stdout","time":963.982321144,"data":"\n"}
+,{"stream_name":"stdout","time":963.982326165,"data":"--- seed 2026 ---\n"}
+,{"stream_name":"stdout","time":964.208248927,"data":"backbone weights: /kaggle/input/timm-backbones-offline/resnet18.a1_in1k.bin (offline, 122 tensors, 0 missing)\n"}
+,{"stream_name":"stdout","time":1050.22743516,"data":"  seed 2026 epoch 1/4  loss 0.6057  (86s)\n"}
+,{"stream_name":"stdout","time":1114.38309395,"data":"  seed 2026 epoch 2/4  loss 0.5502  (64s)\n"}
+,{"stream_name":"stdout","time":1178.827298689,"data":"  seed 2026 epoch 3/4  loss 0.5279  (64s)\n"}
+,{"stream_name":"stdout","time":1242.576960243,"data":"  seed 2026 epoch 4/4  loss 0.5118  (64s)\n"}
+,{"stream_name":"stdout","time":1244.98038526,"data":"  seed 2026: full-set macro AUC 0.7699 | fold mean 0.7680 ± 0.0459 | dropped cells 0/300 (0.0%)\n"}
+,{"stream_name":"stdout","time":1244.980422723,"data":"[budget] after seed 2026: 0.14 h of 6.75 h used (2% of the Kaggle cap)\n"}
+,{"stream_name":"stdout","time":1244.980430047,"data":"\n"}
+,{"stream_name":"stdout","time":1244.980436019,"data":"--- seed 2027 ---\n"}
+,{"stream_name":"stdout","time":1244.980440416,"data":"backbone weights: /kaggle/input/timm-backbones-offline/resnet18.a1_in1k.bin (offline, 122 tensors, 0 missing)\n"}
+,{"stream_name":"stdout","time":1309.983570118,"data":"  seed 2027 epoch 1/4  loss 0.6070  (65s)\n"}
+,{"stream_name":"stdout","time":1374.242814899,"data":"  seed 2027 epoch 2/4  loss 0.5509  (64s)\n"}
+,{"stream_name":"stdout","time":1438.327838369,"data":"  seed 2027 epoch 3/4  loss 0.5261  (64s)\n"}
+,{"stream_name":"stdout","time":1502.192905953,"data":"  seed 2027 epoch 4/4  loss 0.5115  (64s)\n"}
+,{"stream_name":"stdout","time":1503.88539423,"data":"  seed 2027: full-set macro AUC 0.7549 | fold mean 0.7577 ± 0.0491 | dropped cells 0/300 (0.0%)\n"}
+,{"stream_name":"stdout","time":1503.885435326,"data":"[budget] after seed 2027: 0.21 h of 6.75 h used (2% of the Kaggle cap)\n"}
+,{"stream_name":"stdout","time":1503.885469672,"data":"\n"}
+,{"stream_name":"stdout","time":1503.885475064,"data":"--- seed 2028 ---\n"}
+,{"stream_name":"stdout","time":1503.917507178,"data":"backbone weights: /kaggle/input/timm-backbones-offline/resnet18.a1_in1k.bin (offline, 122 tensors, 0 missing)\n"}
+,{"stream_name":"stdout","time":1568.358384449,"data":"  seed 2028 epoch 1/4  loss 0.6010  (64s)\n"}
+,{"stream_name":"stdout","time":1632.465992214,"data":"  seed 2028 epoch 2/4  loss 0.5511  (64s)\n"}
+,{"stream_name":"stdout","time":1697.336490238,"data":"  seed 2028 epoch 3/4  loss 0.5261  (65s)\n"}
+,{"stream_name":"stdout","time":1761.975535888,"data":"  seed 2028 epoch 4/4  loss 0.5115  (65s)\n"}
+,{"stream_name":"stdout","time":1763.49069734,"data":"  seed 2028: full-set macro AUC 0.7678 | fold mean 0.7607 ± 0.0418 | dropped cells 0/300 (0.0%)\n"}
+,{"stream_name":"stdout","time":1763.490750626,"data":"[budget] after seed 2028: 0.29 h of 6.75 h used (3% of the Kaggle cap)\n"}
+,{"stream_name":"stdout","time":1763.93246978,"data":"BASELINE CV (mean full-set macro AUC over 3 seeds) : 0.7642\n"}
+,{"stream_name":"stdout","time":1763.932505775,"data":"  spread across seeds                                  : ±0.0066\n"}
+,{"stream_name":"stdout","time":1763.932518416,"data":"  fold mean ± sigma                                    : 0.7621 ± 0.0459\n"}
+,{"stream_name":"stdout","time":1763.932536652,"data":"  =\u003e a later change must move CV by more than           : 0.0918  (2 sigma)\n"}
+,{"stream_name":"stdout","time":1763.932543586,"data":"  undefined (fold,label) cells dropped                  : 0/900\n"}
+,{"stream_name":"stdout","time":1763.932550403,"data":"  3-seed ensemble                                      : 0.7760\n"}
+,{"stream_name":"stdout","time":1763.932556272,"data":"  labeller L1-llm-v4-blend alone                          : 0.6879\n"}
+,{"stream_name":"stdout","time":1763.932562005,"data":"\n"}
+,{"stream_name":"stdout","time":1763.932567444,"data":"  per target (seed-ensemble):\n"}
+,{"stream_name":"stdout","time":1763.932572698,"data":"MCL                 0.676\n"}
+,{"stream_name":"stdout","time":1763.932577789,"data":"ACL                 0.684\n"}
+,{"stream_name":"stdout","time":1763.932582859,"data":"Contusion           0.725\n"}
+,{"stream_name":"stdout","time":1763.932589431,"data":"Fracture            0.735\n"}
+,{"stream_name":"stdout","time":1763.932595627,"data":"Medial Meniscus     0.740\n"}
+,{"stream_name":"stdout","time":1763.93260166,"data":"Lateral OA          0.768\n"}
+,{"stream_name":"stdout","time":1763.932606759,"data":"PF OA               0.768\n"}
+,{"stream_name":"stdout","time":1763.932611727,"data":"Synovitis           0.773\n"}
+,{"stream_name":"stdout","time":1763.932616618,"data":"Lateral Meniscus    0.790\n"}
+,{"stream_name":"stdout","time":1763.932622234,"data":"Baker's             0.839\n"}
+,{"stream_name":"stdout","time":1763.932628686,"data":"Medial OA           0.868\n"}
+,{"stream_name":"stdout","time":1763.932634515,"data":"Effusion            0.947\n"}
+,{"stream_name":"stdout","time":1764.235329709,"data":"\n"}
+,{"stream_name":"stdout","time":1764.235361095,"data":"submission written: /kaggle/working/submission.csv  (3 rows, 0 fell back to 0.5)\n"}
+,{"stream_name":"stdout","time":1764.235368225,"data":"inference: 0.09 s/study (cold cache)\n"}
+,{"stream_name":"stdout","time":1764.235374122,"data":"     500 hidden studies -\u003e  0.01 h   OK\n"}
+,{"stream_name":"stdout","time":1764.235380896,"data":"    1000 hidden studies -\u003e  0.02 h   OK\n"}
+,{"stream_name":"stdout","time":1764.23538631,"data":"    2000 hidden studies -\u003e  0.05 h   OK\n"}
+,{"stream_name":"stdout","time":1764.235403905,"data":"    5000 hidden studies -\u003e  0.12 h   OK\n"}
+,{"stream_name":"stdout","time":1764.235408033,"data":"   (hidden test size is unpublished — rules.md [verify]. Read the row you believe.)\n"}
+,{"stream_name":"stdout","time":1764.262058756,"data":"submission contract: 7/7 assertions pass (3 rows)\n"}
+,{"stream_name":"stdout","time":1764.262078742,"data":"{\n"}
+,{"stream_name":"stdout","time":1764.262082228,"data":"  \"experiment_id\": \"exp-08-llm-labels\",\n"}
+,{"stream_name":"stdout","time":1764.262085352,"data":"  \"run_mode\": \"full\",\n"}
+,{"stream_name":"stdout","time":1764.262088072,"data":"  \"date\": \"2026-09-14\",\n"}
+,{"stream_name":"stdout","time":1764.262090599,"data":"  \"labeller_version\": \"L1-llm-v4-blend\",\n"}
+,{"stream_name":"stdout","time":1764.262093274,"data":"  \"labeller_gold_auc\": 0.6879,\n"}
+,{"stream_name":"stdout","time":1764.26209564,"data":"  \"preproc_version\": \"p1\",\n"}
+,{"stream_name":"stdout","time":1764.262098076,"data":"  \"backbone\": \"resnet18\",\n"}
+,{"stream_name":"stdout","time":1764.262100476,"data":"  \"epochs\": 4,\n"}
+,{"stream_name":"stdout","time":1764.262102819,"data":"  \"seeds\": [\n"}
+,{"stream_name":"stdout","time":1764.262105997,"data":"    2026,\n"}
+,{"stream_name":"stdout","time":1764.262108388,"data":"    2027,\n"}
+,{"stream_name":"stdout","time":1764.262110628,"data":"    2028\n"}
+,{"stream_name":"stdout","time":1764.262117824,"data":"  ],\n"}
+,{"stream_name":"stdout","time":1764.262120243,"data":"  \"n_folds\": 5,\n"}
+,{"stream_name":"stdout","time":1764.26212267,"data":"  \"eval_repeats\": 5,\n"}
+,{"stream_name":"stdout","time":1764.262125112,"data":"  \"train_studies\": 4349,\n"}
+,{"stream_name":"stdout","time":1764.262127436,"data":"  \"train_gpu_seconds\": 797.6,\n"}
+,{"stream_name":"stdout","time":1764.262129896,"data":"  \"per_seed_full_auc\": [\n"}
+,{"stream_name":"stdout","time":1764.262132222,"data":"    0.7699,\n"}
+,{"stream_name":"stdout","time":1764.262134512,"data":"    0.7549,\n"}
+,{"stream_name":"stdout","time":1764.262136808,"data":"    0.7678\n"}
+,{"stream_name":"stdout","time":1764.262139049,"data":"  ],\n"}
+,{"stream_name":"stdout","time":1764.262141339,"data":"  \"baseline_cv\": 0.7642,\n"}
+,{"stream_name":"stdout","time":1764.262143636,"data":"  \"seed_spread\": 0.0066,\n"}
+,{"stream_name":"stdout","time":1764.262146023,"data":"  \"fold_mean\": 0.7621,\n"}
+,{"stream_name":"stdout","time":1764.262148639,"data":"  \"sigma\": 0.0459,\n"}
+,{"stream_name":"stdout","time":1764.262150966,"data":"  \"significance_threshold_2sigma\": 0.0918,\n"}
+,{"stream_name":"stdout","time":1764.262153428,"data":"  \"dropped_cells\": 0,\n"}
+,{"stream_name":"stdout","time":1764.262155791,"data":"  \"total_cells\": 900,\n"}
+,{"stream_name":"stdout","time":1764.26215812,"data":"  \"ensemble_full_auc\": 0.776,\n"}
+,{"stream_name":"stdout","time":1764.262160436,"data":"  \"per_target_auc\": {\n"}
+,{"stream_name":"stdout","time":1764.262162835,"data":"    \"ACL\": 0.684,\n"}
+,{"stream_name":"stdout","time":1764.262165213,"data":"    \"MCL\": 0.676,\n"}
+,{"stream_name":"stdout","time":1764.262167608,"data":"    \"Medial Meniscus\": 0.74,\n"}
+,{"stream_name":"stdout","time":1764.262169954,"data":"    \"Lateral Meniscus\": 0.79,\n"}
+,{"stream_name":"stdout","time":1764.262172265,"data":"    \"Medial OA\": 0.868,\n"}
+,{"stream_name":"stdout","time":1764.262174581,"data":"    \"Lateral OA\": 0.768,\n"}
+,{"stream_name":"stdout","time":1764.262176886,"data":"    \"PF OA\": 0.768,\n"}
+,{"stream_name":"stdout","time":1764.262179176,"data":"    \"Effusion\": 0.947,\n"}
+,{"stream_name":"stdout","time":1764.262194282,"data":"    \"Synovitis\": 0.773,\n"}
+,{"stream_name":"stdout","time":1764.262197043,"data":"    \"Baker's\": 0.839,\n"}
+,{"stream_name":"stdout","time":1764.26219948,"data":"    \"Contusion\": 0.725,\n"}
+,{"stream_name":"stdout","time":1764.262201868,"data":"    \"Fracture\": 0.735\n"}
+,{"stream_name":"stdout","time":1764.262204253,"data":"  },\n"}
+,{"stream_name":"stdout","time":1764.262206553,"data":"  \"infer_seconds_total\": 0.3,\n"}
+,{"stream_name":"stdout","time":1764.262209056,"data":"  \"infer_seconds_per_study\": 0.09,\n"}
+,{"stream_name":"stdout","time":1764.262211537,"data":"  \"studies_failed_to_0.5\": 0,\n"}
+,{"stream_name":"stdout","time":1764.262213968,"data":"  \"total_runtime_hours\": 0.285\n"}
+,{"stream_name":"stdout","time":1764.262216388,"data":"}\n"}
+,{"stream_name":"stdout","time":1764.262218781,"data":"[budget] end of notebook: 0.29 h of 6.75 h used (3% of the Kaggle cap)\n"}
+,{"stream_name":"stderr","time":1770.468184707,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":1770.46822243,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":1770.635743555,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":1770.635771389,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":1771.509672449,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":1771.829504728,"data":"[NbConvertApp] Writing 91579 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":1774.419209513,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":1775.474443546,"data":"[NbConvertApp] Writing 539229 bytes to __results__.html\n"}
+]

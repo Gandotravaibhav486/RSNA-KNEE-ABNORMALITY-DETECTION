@@ -1,0 +1,9 @@
+{
+  "experiment_id": "exp-24-p3-sagittal",
+  "screen_auc_p3": 0.7656,
+  "ref_p2_t2": 0.7477,
+  "K": 22,
+  "train_version": "t2-independent-flips",
+  "n": 3406,
+  "date": "2026-09-16"
+}

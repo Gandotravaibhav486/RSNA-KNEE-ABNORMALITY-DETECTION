@@ -2,3 +2,17 @@ vaibhav486/rsna-knee-cache-build-p1
 vaibhav486/rsna-knee-baseline-v1-full
 vaibhav486/rsna-knee-exp-04-screening-metric
 vaibhav486/rsna-knee-exp-10-epochs
+vaibhav486/rsna-knee-exp-08-llm-labels
+vaibhav486/rsna-knee-exp-12-own-llm-labels
+vaibhav486/rsna-knee-exp-13-epochs-L1
+vaibhav486/rsna-knee-cache-build-p2
+vaibhav486/rsna-knee-exp-11-geometry-p2
+vaibhav486/rsna-knee-exp-16-screen-p2
+vaibhav486/rsna-knee-exp-17-t2-independent-flips
+vaibhav486/rsna-knee-exp-18-confidence-weight
+vaibhav486/rsna-knee-exp-15-epochs-screened
+vaibhav486/rsna-knee-exp-22-dinov2-small
+vaibhav486/rsna-knee-exp-23-p2-t2-ep12
+vaibhav486/rsna-knee-cache-build-p3
+vaibhav486/rsna-knee-exp-24-p3-sagittal
+vaibhav486/rsna-knee-exp-21-profile-public

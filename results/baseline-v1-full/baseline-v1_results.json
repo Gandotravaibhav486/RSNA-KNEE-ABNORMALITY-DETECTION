@@ -1,0 +1,50 @@
+{
+  "experiment_id": "baseline-v1",
+  "run_mode": "full",
+  "date": "2026-09-13",
+  "labeller_version": "v1-keyword",
+  "labeller_gold_auc": 0.6879,
+  "preproc_version": "p1",
+  "backbone": "resnet18",
+  "epochs": 4,
+  "seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "n_folds": 5,
+  "eval_repeats": 5,
+  "train_studies": 3406,
+  "train_gpu_seconds": 607.3,
+  "per_seed_full_auc": [
+    0.6333,
+    0.6366,
+    0.6318
+  ],
+  "baseline_cv": 0.6339,
+  "seed_spread": 0.002,
+  "fold_mean": 0.628,
+  "sigma": 0.0555,
+  "significance_threshold_2sigma": 0.111,
+  "dropped_cells": 0,
+  "total_cells": 900,
+  "ensemble_full_auc": 0.6442,
+  "per_target_auc": {
+    "ACL": 0.615,
+    "MCL": 0.365,
+    "Medial Meniscus": 0.691,
+    "Lateral Meniscus": 0.702,
+    "Medial OA": 0.727,
+    "Lateral OA": 0.598,
+    "PF OA": 0.537,
+    "Effusion": 0.882,
+    "Synovitis": 0.533,
+    "Baker's": 0.779,
+    "Contusion": 0.659,
+    "Fracture": 0.643
+  },
+  "infer_seconds_total": 0.2,
+  "infer_seconds_per_study": 0.08,
+  "studies_failed_to_0.5": 0,
+  "total_runtime_hours": 0.361
+}

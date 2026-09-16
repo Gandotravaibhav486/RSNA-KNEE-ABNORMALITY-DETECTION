@@ -111,6 +111,33 @@ tighter, for zero GPU. Every future comparison should be paired from saved predi
 argues about a marginal number. (It still was not enough here: Δ=+0.0154, CI [−0.0081, +0.0410],
 P(Δ>0)=0.89.)
 
+**Finding — the gap is NOT ensembling. A single model of theirs beats our ensemble by 0.13.**
+exp-21 ran the public notebook's CoAtNet branch against our own 58 gold studies:
+
+| model | gold macro AUC |
+|---|---|
+| **CoAtNet v5 (single)** | **0.9205** |
+| coatnet384x | 0.9012 |
+| coatnet384 | 0.8947 |
+| convnext b336 | 0.8840 |
+| effnetv2-l 480 | 0.8726 |
+| **their 5-model ensemble** | **0.9118** — *lower than the best single* |
+| **our best (3-seed ensemble, p2)** | 0.7914 |
+
+Their own greedy weight search agrees: every candidate it tried *reduced* the score (−0.0008 to
+−0.0018). So the 0.936 is not built on ensembling — **one CoAtNet at 384 px is worth more than five
+models averaged**, and more than our whole pipeline by 0.13. That reverses the plan implied by the
+"20 DINOv2 models" reading: the lever is a stronger single model at higher resolution, not more
+seeds. Our rank-averaging gain (+0.0021) is real but third-order against this.
+
+**Finding — p3 works, but not for the reason it was built.**
++0.0179 at 4× the bar, 12/12 targets improved — our largest gain since the label swap. But the
+mechanism is falsified: the four sagittal-read targets gained **+0.0112** on average while the other
+eight gained **+0.0211**. The diffuse findings benefited *more* than the focal ones the weighting was
+designed for. The likelier cause is simply **22 windows vs 18** — 22% more coverage — not their
+distribution. Pre-registered as the falsification test, and it fired. Next: 22 *uniform* windows,
+which separates count from distribution.
+
 **Finding — the 0.936 is not "DINOv2", it is 20 of them.** Read from the public notebook's own code:
 
 | | public 0.936 branch | our exp-22 |
@@ -296,7 +323,7 @@ the pair says so at a glance. Everything before exp-17 is implicitly `t1`.
 | `exp-20260914-08b-llm-model` | 2026-09-14 | data-analysis | Train on the public LLM key instead of the regex — everything else identical | label quality was the binding constraint | 0.6339 | **0.7642** | **+0.1303** | **0.803** | **+1** | done → **L1** |
 | `exp-20260914-09-silence-per-finding` | 2026-09-16 | loss | Silence ⇒ negative for Baker's / Medial OA | **Moot on our key**: `v4_blend` has **0.1%** of cells at exactly 0.5 (v2 has 19.2%), and Baker's has 0.2% in the uncertain band. The blend already resolved them | 0.7794 | — | — | — | — | **rejected unrun — measured** |
 | `exp-20260916-18-confidence-weight` | 2026-09-16 | loss | Weight each cell by `2·\|p−0.5\|` | the key is soft; plain BCE fits a 0.51 as hard as a 0.99 | 0.7477 | **0.7420** | **−0.0057**, paired 2σ 0.0029, CI [−0.0083, −0.0029], P(Δ>0)=0.000 | — | **−1** | done |
-| `exp-20260916-24-p3-sagittal` | 2026-09-16 | architecture | **p3**: asymmetric sagittal-weighted slots — Sag-FS 6, Sag-nonFS 5, Cor-FS 4, Cor-nonFS 3, Axial 4 = **22 windows, 11 sagittal (50%)**, vs p2's uniform 18 with 33% | Our per-label shortfall is ACL/MCL/medial meniscus — focal, sagittal-read — and p2 *cut* sagittal density. The 0.936 notebook independently spends 32 of 64 slices on sagittal | 0.7477 | — | — | — | — | queued behind cache p3 |
+| `exp-20260916-24-p3-sagittal` | 2026-09-16 | architecture | **p3**: 22 windows, 11 sagittal (50%) vs p2's uniform 18 (33%) | focal sagittal-read targets carry our shortfall | 0.7477 | **0.7656** | **+0.0179**, paired 2σ 0.0041, CI [+0.0139, +0.0219], **12/12 targets up** | — | **+1**, mechanism **not** confirmed | done |
 | `exp-20260916-25-rank-average` | 2026-09-16 | packaging | Rank-average the seed ensemble instead of probability-averaging | measured free on stored exp-11 seeds: **0.7935 vs 0.7914** | 0.7914 | 0.7935 | **+0.0021** | — | adopt at inference | to fold into the next full run |
 | `exp-20260916-23-p2-t2-ep12` | 2026-09-16 | training | **Submittable** build of exp-15's finding: p2 geometry + t2 flips + 12 epochs × 3 seeds, with test inference | exp-15 proved the schedule on the screening metric but is a screening notebook — it cannot produce a submission | 0.7794 | — | — | — | — | running |
 | `exp-20260915-15-epochs-screened` | 2026-09-16 | training | 12 epochs vs 4 at p2/t2, screened | gold could not resolve exp-13 | 0.7477 | **0.7550** | **+0.0073**, paired 2σ 0.0049, CI [+0.0027, +0.0118], P=0.998 | — | **+1** | done |
@@ -308,7 +335,7 @@ the pair says so at a glance. Everything before exp-17 is implicitly `t1`.
 | `exp-20260915-16-screen-p2` | 2026-09-16 | split | Screen the p2 geometry, paired against exp-04 v2 | gold could not resolve exp-11 | 0.7419 | **0.7501** | +0.0082, CI [+0.0041, +0.0125] | — | **+1** | done |
 | `exp-20260916-17-t2-flips` | 2026-09-16 | training | `t2-independent-flips`: flip from `torch.rand`, per-worker seeding, pinned shuffle generator | forked workers replayed one numpy stream | 0.7501 | 0.7477 | −0.0024, bar 0.0032 | — | **0 (null)** | done — **adopted as a correctness fix** |
 | `exp-20260916-22-dinov2-small` | 2026-09-16 | architecture | Swap `resnet18` → **DINOv2 ViT-S/14** at p2/t2, its own normalisation read from the checkpoint | resnet18→ViT is a different jump from the DINOv2-S→B null a competitor measured | 0.7477 | **0.6349** | **−0.1128** (bar 0.0044), and 2.8× slower per epoch | — | **−1** | done |
-| `exp-20260916-21-profile-public` | 2026-09-16 | paper | Run the public ensemble's CoAtNet branch and its own gold-validation cell, to get **per-label** AUCs on our 58 studies | The 0.936 per-label breakdown was never published; we cannot see where the 0.128 lives | — | — | — | — | — | **queued** |
+| `exp-20260916-21-profile-public` | 2026-09-16 | paper | Run the public ensemble's CoAtNet branch on our 58 gold studies | where does the 0.128 gap live? | our 0.7914 | **their single model 0.9205** | — | — | **+1** | done |
 | `exp-20260916-19-split-train-infer` | 2026-09-16 | packaging | Publish weights as a dataset; submission notebook only infers | saves ~0.7 h of rerun, makes the submitted artefact exactly the measured one, and matters for the Efficiency Prize | — | — | — | — | — | **proposed** |
 | `exp-20260914-14-own-llm-v2` | 2026-09-16 | data-analysis | Reopen exp-12 with prompt v2 (a cost on "not addressed") **and** batched generation | the idea failed on execution, not premise | 0.8927 | — | — | — | — | **proposed** (1/3 fixes used) |
 
