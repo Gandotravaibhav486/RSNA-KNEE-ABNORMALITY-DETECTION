@@ -112,6 +112,21 @@ tighter, for zero GPU. Every future comparison should be paired from saved predi
 argues about a marginal number. (It still was not enough here: Δ=+0.0154, CI [−0.0081, +0.0410],
 P(Δ>0)=0.89.)
 
+**Finding — p3's geometry gain does not survive longer training.** The screening metric measured
+p3 at **+0.0179** over p2 at 4 epochs (CI [+0.0139, +0.0219], 12/12 targets). At 12 epochs on gold,
+the same geometry gives **0.8161 vs b1's 0.8319 — Δ −0.0158**, paired CI [−0.0437, +0.0110],
+P(Δ>0)=0.12. Not significant either way, but clearly *not* the +0.018 the screening run promised.
+
+Two readings, and we cannot yet separate them:
+1. **An interaction**: extra windows help an undertrained model (4 epochs) and stop helping, or hurt,
+   once training is long enough to use the windows it already had.
+2. **Seed noise**: this run's seed spread is **±0.0218** (0.7572 / 0.8090 / 0.7946), an order of
+   magnitude wider than b1's ±0.0020, and comparable to the effect being measured.
+
+Either way the lesson is procedural: **a screening result at one training length does not transfer to
+another.** Screening runs must match the configuration they are meant to inform — ours were all at
+4 epochs while the baseline moved to 12.
+
 **Finding — longer training buys FOCAL findings specifically.** exp-23 (12 epochs, LB **0.824**)
 against exp-11 (4 epochs, LB 0.808), per label on gold:
 
