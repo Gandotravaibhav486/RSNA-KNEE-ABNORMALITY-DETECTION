@@ -111,6 +111,22 @@ tighter, for zero GPU. Every future comparison should be paired from saved predi
 argues about a marginal number. (It still was not enough here: Δ=+0.0154, CI [−0.0081, +0.0410],
 P(Δ>0)=0.89.)
 
+**Finding — DINOv2's deficit is uniform, which is what a training failure looks like.** Per label,
+DINOv2 lost on **12 of 12** targets, by −0.069 to −0.151, with no structure:
+
+| | resnet18 | DINOv2 | Δ |
+|---|---|---|---|
+| worst: Medial OA | 0.787 | 0.636 | −0.151 |
+| best: Fracture | 0.729 | 0.660 | −0.069 |
+| macro | 0.7478 | 0.6350 | −0.1128 |
+
+A representational mismatch would be *selective* — a backbone that cannot see thin meniscal tears
+would still read effusion, which is bright and diffuse. Losing everything by a similar margin, while
+staying above chance everywhere, is the signature of an encoder that is **undertrained rather than
+unsuited**: it learned something on every target, just far less of it. Combined with the fact that it
+ran on resnet18's LR and schedule, the reading is that a ViT needed settings we did not give it —
+not that DINOv2 cannot do this task.
+
 **Finding — the schedule question was never about the schedule; it was about the labels.** The same
 sweep, three times, on three instruments:
 

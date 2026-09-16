@@ -1,0 +1,9 @@
+{
+  "experiment_id": "exp-22-dinov2-small",
+  "screen_auc": 0.6349,
+  "ref_resnet18_p2_t2": 0.7477,
+  "backbone": "dinov2-small",
+  "train_version": "t2-independent-flips",
+  "n": 3406,
+  "date": "2026-09-16"
+}
