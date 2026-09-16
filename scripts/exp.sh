@@ -151,7 +151,7 @@ cmd_status() {
 }
 
 cmd_queue() {
-  local id=$1 nb=$2 running dep
+  local id=$1 nb=$2 dep
   # AFTER="owner/slug" blocks until that kernel is COMPLETE. A run whose cache is still building
   # will fail preflight on arrival — cheap, but it wastes a slot and confuses the log.
   if [ -n "${AFTER:-}" ]; then
@@ -165,24 +165,16 @@ cmd_queue() {
     done
   fi
   for _ in $(seq 1 240); do
-    running=$(cmd_status | grep -c RUNNING || true)
-    if [ "$running" -lt 2 ]; then
-      echo "$(date +%H:%M:%S) slot free ($running running) — pushing $id"
-      cmd_push "$id" "$nb" gpu && return 0
-    fi
+    if cmd_push "$id" "$nb" gpu; then return 0; fi     # refusal IS the slot signal
     sleep 60
   done
   echo "no GPU slot freed within 4 h"; return 1
 }
 
 cmd_qrun() {
-  local id=$1 json=${2:-'{}'} running
+  local id=$1 json=${2:-'{}'}
   for _ in $(seq 1 240); do
-    running=$(cmd_status | grep -c RUNNING || true)
-    if [ "$running" -lt 2 ]; then
-      echo "$(date +%H:%M:%S) slot free ($running running) — running $id"
-      cmd_run "$id" "$json" && return 0
-    fi
+    if cmd_run "$id" "$json"; then return 0; fi         # refusal IS the slot signal
     sleep 60
   done
   echo "no GPU slot freed within 4 h"; return 1
