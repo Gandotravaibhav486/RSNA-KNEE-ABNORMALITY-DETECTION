@@ -2,7 +2,8 @@
 # exp.sh — run one experiment end to end on Kaggle, isolated from every other experiment.
 #
 #   ./scripts/exp.sh new    <exp-id>            # git worktree + branch, isolated working copy
-#   ./scripts/exp.sh push   <exp-id> <nb> [cpu] # push to its own kernel and start the run
+#   ./scripts/exp.sh run    <exp-id> '<json>'   # PREFERRED: baseline notebook + config overrides
+#   ./scripts/exp.sh push   <exp-id> <nb> [cpu] # push an explicit notebook (legacy / one-offs)
 #   ./scripts/exp.sh watch  <exp-id>            # poll until the run ends
 #   ./scripts/exp.sh fetch  <exp-id>            # pull log + results json into results/
 #   ./scripts/exp.sh status                     # every experiment kernel, one line each
@@ -30,6 +31,32 @@ cmd_new() {
     || git -C "$REPO" worktree add "$REPO/worktrees/$id" "$id"
   echo "worktree: $REPO/worktrees/$id   branch: $id"
   echo "Work only inside it (AGENTS.md §9). Its work/, cache/, subs/ are its own."
+}
+
+# AGENTS.md §14: one baseline notebook, experiments are config overrides on top of it.
+cmd_run() {
+  local id=$1 json=${2:-'{}'} tmp
+  tmp=$(mktemp -d)/nb.ipynb
+  "${PY:-/Applications/anaconda3/bin/python3}" - "$REPO/notebooks/baseline.ipynb" "$tmp" "$id" "$json" <<'PYEOF'
+import json, sys
+src, dst, exp_id, overrides = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+ov = json.loads(overrides)
+nb = json.load(open(src))
+hit = 0
+for c in nb["cells"]:
+    if c["cell_type"] == "code" and "OVERRIDES: dict = {}" in "".join(c["source"]):
+        body = "".join(c["source"]).replace(
+            "OVERRIDES: dict = {}",
+            "OVERRIDES: dict = " + json.dumps(ov, indent=4))
+        body = body.replace('EXPERIMENT_ID = "baseline-b1"', f'EXPERIMENT_ID = "{exp_id}"')
+        body += f'\nEXPERIMENT_ID = "{exp_id}"\n'
+        c["source"] = [l + "\n" for l in body.split("\n")[:-1]] + [body.split("\n")[-1]]
+        hit += 1
+assert hit == 1, f"override cell not found exactly once ({hit})"
+json.dump(nb, open(dst, "w"), indent=1)
+print(f"{exp_id}: baseline + {len(ov)} override(s): {list(ov)}")
+PYEOF
+  cmd_push "$id" "$tmp" "${3:-gpu}"
 }
 
 cmd_push() {
@@ -149,6 +176,7 @@ cmd_queue() {
 
 case "${1:-}" in
   new)    cmd_new "$2" ;;
+  run)    cmd_run "$2" "${3:-{\}}" ;;
   queue)  cmd_queue "$2" "$3" ;;
   push)   cmd_push "$2" "$3" "${4:-gpu}" ;;
   watch)  cmd_watch "$2" ;;

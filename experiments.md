@@ -51,6 +51,7 @@ gate are *accepted improvements* — merged and used, but they do not move a bas
 | L0 | weak-label CNN, **regex labels** (resnet18 + per-target attention, 12 windows) | `notebooks/baseline-v1.ipynb` / `main` | 0.6339 ± σ 0.0555 | 0.641 | initial | 2026-09-13 |
 | **L1** | same model, **public LLM label key** `llm_labels_v4_blend` | `notebooks/exp-08-llm-labels.ipynb` | **0.7642** ± σ 0.0459 (ensemble 0.7760) | **0.803** | **gate A: 35.6% CV closure, 45.1% on LB; confirmed on LB** | 2026-09-14 |
 | L1 + p2 | same, 18 windows @224 | `notebooks/exp-11-geometry-p2.ipynb` | 0.7794 (ens 0.7914) | **0.808** | accepted improvement (6.5% closure — under the 20% gate) | 2026-09-15 |
+| **b1 — current baseline** | L1 labels · p2 geometry · t2 flips · **12 epochs × 3 seeds** | **`notebooks/baseline.ipynb`** | **0.8319** | **0.824** | accepted improvement; the reference every experiment now overrides | 2026-09-16 |
 
 ### Measured facts from the smoke run (2026-09-13, Kaggle, CPU fallback)
 
@@ -332,6 +333,11 @@ like changing a seed. The paired bootstrap resamples **studies**, so it captures
 but **not** training-run noise. Seed spread on gold was ±0.0054–0.0066, comfortably larger than this
 Δ. Separating "t2 effect" from "different random draw" would need several seeds per arm, which is not
 worth the GPU for a fix we would keep regardless.
+
+**One notebook (AGENTS.md §14).** `notebooks/baseline.ipynb` is the pipeline; experiments are
+config overrides passed to `./scripts/exp.sh run`. The baseline on disk always reproduces
+**gold 0.8319 / LB 0.824**. Earlier `exp-*.ipynb` files are kept as the record of runs already made,
+but nothing new is built by copying them.
 
 **Version axes.** `PREPROC_VERSION` (`p1`/`p2`) keys the tensor cache. `TRAIN_VERSION` (`t1`/`t2`)
 keys the training stream — introduced 2026-09-16 because the augmentation fix changes results

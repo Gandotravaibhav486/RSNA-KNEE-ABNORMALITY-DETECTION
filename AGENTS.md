@@ -214,6 +214,32 @@ If the same workflow is run more than once in a day, or shows up every day, **pr
 Vaibhav as a schema/skill** (name, trigger, steps, inputs, outputs) rather than re-typing it.
 Do not create the schema unilaterally; propose, get a yes, then build it.
 
+## 14. One baseline, versioned — never a new notebook per experiment
+
+**There is exactly one pipeline notebook: `notebooks/baseline.ipynb`.** It carries a
+`BASELINE_VERSION` and reproduces, unchanged, the numbers recorded for that version.
+
+An experiment is **a set of config overrides on top of it**, never a copy:
+
+```bash
+./scripts/exp.sh run exp-27-ep20 '{"EPOCHS": 20}'
+./scripts/exp.sh run exp-28-geom '{"PREPROC_VERSION": "p4", "SLOTS": [["Sagittal",1,4], ...]}'
+```
+
+`run` injects the overrides into a single dedicated cell and pushes; **exactly one cell differs**
+between the baseline and any variant, which is checkable and was verified when this rule was added.
+Unknown keys raise, so a typo cannot silently do nothing. Derived values (`K`, `N_SLOT`, `CACHE`)
+are recomputed after the overrides, so changing `SLOTS` or `IMG` actually takes effect.
+
+**Why this is a rule.** Copy-patching notebooks produced, in one session: a regex that deleted half
+a config cell (48 undefined names), a variant missing the `preflight` it called, a screening notebook
+missing two imports that died after six folds of training, and four notebooks that quietly drifted
+apart. Every one of those was a copy artefact, not a modelling mistake.
+
+**When the baseline moves**, bump `BASELINE_VERSION`, record the new numbers, and state which
+overrides became defaults. A separate notebook is justified only when the *shape* of the run differs
+— a cache builder, or a profiling run against someone else's code — never for a different setting.
+
 ## 12. Agent action log
 
 Every agent writes to [agent-log.md](agent-log.md) — one line per meaningful action, appended as
