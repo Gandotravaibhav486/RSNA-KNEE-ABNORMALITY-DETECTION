@@ -19,3 +19,4 @@ vaibhav486/rsna-knee-exp-23-p2-t2-ep12
 vaibhav486/rsna-knee-exp-24-p3-sagittal
 vaibhav486/rsna-knee-exp-26-p3-t2-ep12
 vaibhav486/rsna-knee-exp-27-ep20
+vaibhav486/rsna-knee-exp-25-p4-uniform22
