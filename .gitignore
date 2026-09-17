@@ -11,3 +11,9 @@ subs/
 .DS_Store
 .ipynb_checkpoints/
 worktrees/
+
+# Session/tooling state and unrelated work — swept in by a `git add -A` on 2026-09-17
+.agents/
+.claude/
+skills-lock.json
+mockintervew-posters/

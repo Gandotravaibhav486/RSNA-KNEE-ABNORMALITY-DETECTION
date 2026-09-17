@@ -1,8 +1,0 @@
-{
-  "artboards": [
-    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1080, "h": 1920, "title": "Story / WhatsApp status" },
-    { "file": "Square.dc.html", "x": 1200, "y": 0, "w": 1080, "h": 1080, "title": "Square feed post" },
-    { "file": "EmailBanner.dc.html", "x": 1200, "y": 1240, "w": 1200, "h": 400, "title": "Email header banner" }
-  ],
-  "launch": { "view": "canvas" }
-}
