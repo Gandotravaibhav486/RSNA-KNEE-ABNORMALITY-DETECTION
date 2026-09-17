@@ -24,6 +24,10 @@ USER_SLUG=${KAGGLE_USER:-vaibhav486}
 REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 CACHE_KERNEL="${CACHE_KERNEL_OVERRIDE:-$USER_SLUG/rsna-knee-cache-build-p1}"
 WEIGHTS_DS="$USER_SLUG/timm-backbones-offline"
+# The L1 label key. NOT optional: every experiment since exp-08 trains and screens on it, and a run
+# without it fails the lineage assertion after the notebook has already mounted. It used to be
+# passed per-run through EXTRA_DS, and forgetting it killed exp-29 and exp-31 (2026-09-17).
+LABELS_DS="stevenleehans/rsna-knee-llm-report-labels"
 COMP="rsna-knee-abnormality-detection"
 
 kernel_ref() { echo "$USER_SLUG/rsna-knee-$1"; }
@@ -71,7 +75,7 @@ cmd_qscreen() { NB_SRC="$REPO/notebooks/screen.ipynb" cmd_qrun "$@"; }
 cmd_push() {
   local id=$1 nb=$2 hw=${3:-gpu} dir
   # EXTRA_DS="owner/slug,owner/slug2" attaches more datasets to this run
-  local DATASETS="\"$WEIGHTS_DS\""
+  local DATASETS="\"$WEIGHTS_DS\", \"$LABELS_DS\""
   if [ -n "${EXTRA_DS:-}" ]; then
     IFS="," read -ra _ds <<< "$EXTRA_DS"
     for d in "${_ds[@]}"; do DATASETS="$DATASETS, \"$d\""; done

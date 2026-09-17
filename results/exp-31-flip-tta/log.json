@@ -1,0 +1,97 @@
+[{"stream_name":"stderr","time":9.692471965,"data":"/usr/local/lib/python3.12/dist-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.\n"}
+,{"stream_name":"stderr","time":9.692544756,"data":"  validate(nb)\n"}
+,{"stream_name":"stderr","time":11.040925831,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":11.040962376,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":11.040967288,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":11.040970954,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":11.960910186,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":11.960951692,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":11.960958203,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":11.960963152,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":438.451995541,"data":"run mode   : full   seeds=[2026, 2027, 2028]   epochs=12\n"}
+,{"stream_name":"stdout","time":438.452051733,"data":"data root  : /kaggle/input/competitions/rsna-knee-abnormality-detection\n"}
+,{"stream_name":"stdout","time":438.452059448,"data":"work dir   : /kaggle/working\n"}
+,{"stream_name":"stdout","time":438.452065241,"data":"cache      : cache_p2  (preproc p2, labeller v1-keyword)\n"}
+,{"stream_name":"stdout","time":438.452071831,"data":"per study  : 18 windows (6 slots x 3 triplets) at 224x224\n"}
+,{"stream_name":"stdout","time":570.520976944,"data":"baseline b1 | experiment baseline-b1\n"}
+,{"stream_name":"stdout","time":570.521014621,"data":"  overrides : {'RUN_MODE': 'submit', 'EVAL_GOLD_FROM_CKPT': True, 'TTA_FLIP': False}\n"}
+,{"stream_name":"stdout","time":570.521022851,"data":"  geometry  : 6 slots, K=18 windows at 224px, cache p2\n"}
+,{"stream_name":"stdout","time":570.521028829,"data":"  training  : 3 seeds x 12 epochs, backbone resnet18\n"}
+,{"stream_name":"stdout","time":570.618120285,"data":"fallback submission written to: /kaggle/working/submission.csv\n"}
+,{"stream_name":"stdout","time":570.618161325,"data":"test rows visible here: 3  (the hidden test set is substituted at rerun)\n"}
+,{"stream_name":"stdout","time":570.933016104,"data":"gold studies: 58   report-only: 4349\n"}
+,{"stream_name":"stdout","time":570.933057687,"data":"\n"}
+,{"stream_name":"stdout","time":570.933065428,"data":"positives per target among the gold studies:\n"}
+,{"stream_name":"stdout","time":570.93307138,"data":"ACL                 24\n"}
+,{"stream_name":"stdout","time":570.933100386,"data":"MCL                  9\n"}
+,{"stream_name":"stdout","time":570.93310559,"data":"Medial Meniscus     26\n"}
+,{"stream_name":"stdout","time":570.933109244,"data":"Lateral Meniscus    23\n"}
+,{"stream_name":"stdout","time":570.933112948,"data":"Medial OA           15\n"}
+,{"stream_name":"stdout","time":570.933117167,"data":"Lateral OA          11\n"}
+,{"stream_name":"stdout","time":570.933120863,"data":"PF OA               21\n"}
+,{"stream_name":"stdout","time":570.933124564,"data":"Effusion            35\n"}
+,{"stream_name":"stdout","time":570.933149877,"data":"Synovitis           27\n"}
+,{"stream_name":"stdout","time":570.933153479,"data":"Baker's             12\n"}
+,{"stream_name":"stdout","time":570.933156724,"data":"Contusion           19\n"}
+,{"stream_name":"stdout","time":570.933159698,"data":"Fracture            18\n"}
+,{"stream_name":"stdout","time":570.93316258,"data":"\n"}
+,{"stream_name":"stdout","time":570.933165614,"data":"rarest target: MCL with 9 positives -\u003e 1.8 expected positives per fold. This is why undefined (fold, label) cells are unavoidable and must be counted.\n"}
+,{"stream_name":"stdout","time":573.505758318,"data":"label coverage (share of studies the report can decide):\n"}
+,{"stream_name":"stdout","time":573.505798884,"data":"ACL                 31.5\n"}
+,{"stream_name":"stdout","time":573.505805018,"data":"MCL                 22.1\n"}
+,{"stream_name":"stdout","time":573.50580975,"data":"Medial Meniscus     36.5\n"}
+,{"stream_name":"stdout","time":573.505814083,"data":"Lateral Meniscus    35.1\n"}
+,{"stream_name":"stdout","time":573.505818521,"data":"Medial OA           16.3\n"}
+,{"stream_name":"stdout","time":573.505822479,"data":"Lateral OA          11.9\n"}
+,{"stream_name":"stdout","time":573.50582683,"data":"PF OA               22.9\n"}
+,{"stream_name":"stdout","time":573.505831683,"data":"Effusion            63.6\n"}
+,{"stream_name":"stdout","time":573.505835727,"data":"Synovitis           12.0\n"}
+,{"stream_name":"stdout","time":573.505839967,"data":"Baker's             33.2\n"}
+,{"stream_name":"stdout","time":573.50584456,"data":"Contusion           24.1\n"}
+,{"stream_name":"stdout","time":573.505849027,"data":"Fracture            18.8\n"}
+,{"stream_name":"stdout","time":573.53376803,"data":"labeller contract: 11/11 assertions pass\n"}
+,{"stream_name":"stdout","time":573.533804743,"data":"known v1 gaps (Spanish 'condropatia' / 'cartilago' unmatched): still present, as expected\n"}
+,{"stream_name":"stdout","time":576.074069285,"data":"          target  gold pos  coverage   AUC\n"}
+,{"stream_name":"stdout","time":576.074125435,"data":"             ACL        24     0.534 0.724\n"}
+,{"stream_name":"stdout","time":576.074132229,"data":"             MCL         9     0.328 0.694\n"}
+,{"stream_name":"stdout","time":576.074138092,"data":" Medial Meniscus        26     0.448 0.633\n"}
+,{"stream_name":"stdout","time":576.074143163,"data":"Lateral Meniscus        23     0.448 0.699\n"}
+,{"stream_name":"stdout","time":576.074146907,"data":"       Medial OA        15     0.155 0.755\n"}
+,{"stream_name":"stdout","time":576.074151287,"data":"      Lateral OA        11     0.121 0.650\n"}
+,{"stream_name":"stdout","time":576.074155114,"data":"           PF OA        21     0.138 0.566\n"}
+,{"stream_name":"stdout","time":576.074158742,"data":"        Effusion        35     0.759 0.640\n"}
+,{"stream_name":"stdout","time":576.07416263,"data":"       Synovitis        27     0.276 0.658\n"}
+,{"stream_name":"stdout","time":576.074166229,"data":"         Baker's        12     0.310 0.797\n"}
+,{"stream_name":"stdout","time":576.074169924,"data":"       Contusion        19     0.431 0.665\n"}
+,{"stream_name":"stdout","time":576.074173594,"data":"        Fracture        18     0.328 0.774\n"}
+,{"stream_name":"stdout","time":576.074177327,"data":"\n"}
+,{"stream_name":"stdout","time":576.074181056,"data":"v1-keyword macro AUC on gold: 0.6879   \u003c- record this in experiments.md\n"}
+,{"stream_name":"stderr","time":679.150400702,"data":"Traceback (most recent call last):\n"}
+,{"stream_name":"stderr","time":679.150435917,"data":"  File \"\u003cstring\u003e\", line 1, in \u003cmodule\u003e\n"}
+,{"stream_name":"stderr","time":679.150552431,"data":"  File \"/usr/local/lib/python3.12/dist-packages/papermill/execute.py\", line 131, in execute_notebook\n"}
+,{"stream_name":"stderr","time":679.150562214,"data":"    raise_for_execution_errors(nb, output_path)\n"}
+,{"stream_name":"stderr","time":679.150714089,"data":"  File \"/usr/local/lib/python3.12/dist-packages/papermill/execute.py\", line 251, in raise_for_execution_errors\n"}
+,{"stream_name":"stderr","time":679.150811097,"data":"    raise error\n"}
+,{"stream_name":"stderr","time":679.151058672,"data":"papermill.exceptions.PapermillExecutionError: \n"}
+,{"stream_name":"stderr","time":679.151080394,"data":"---------------------------------------------------------------------------\n"}
+,{"stream_name":"stderr","time":679.151085975,"data":"Exception encountered at \"In [9]\":\n"}
+,{"stream_name":"stderr","time":679.151091495,"data":"---------------------------------------------------------------------------\n"}
+,{"stream_name":"stderr","time":679.151101117,"data":"AssertionError                            Traceback (most recent call last)\n"}
+,{"stream_name":"stderr","time":679.151106055,"data":"/tmp/ipykernel_16/2297263864.py in \u003ccell line: 0\u003e()\n"}
+,{"stream_name":"stderr","time":679.151110894,"data":"      8 LLM_FILE = \"llm_labels_v4_blend.csv\"\n"}
+,{"stream_name":"stderr","time":679.151115492,"data":"      9 hits = discover_input(f\"**/{LLM_FILE}\")\n"}
+,{"stream_name":"stderr","time":679.151120468,"data":"---\u003e 10 assert hits, f\"{LLM_FILE} not attached — this run cannot be lineage L1\"\n"}
+,{"stream_name":"stderr","time":679.151126164,"data":"     11 llm = pd.read_csv(hits[0])\n"}
+,{"stream_name":"stderr","time":679.15113066,"data":"     12 llm[\"StudyInstanceUID\"] = llm[\"StudyInstanceUID\"].astype(str)\n"}
+,{"stream_name":"stderr","time":679.15113613,"data":"\n"}
+,{"stream_name":"stderr","time":679.151140477,"data":"AssertionError: llm_labels_v4_blend.csv not attached — this run cannot be lineage L1\n"}
+,{"stream_name":"stderr","time":679.151145575,"data":"\n"}
+,{"stream_name":"stderr","time":682.314659763,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":682.314701296,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":682.552376099,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":682.552413246,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":683.474367557,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":683.914763154,"data":"[NbConvertApp] Writing 95268 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":687.248546956,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":688.662245481,"data":"[NbConvertApp] Writing 582701 bytes to __results__.html\n"}
+]
