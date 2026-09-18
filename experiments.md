@@ -177,6 +177,58 @@ Total positive headroom **0.739 across 12 targets = 0.062 of macro AUC**, and th
 **60%** of it. Effusion and Medial OA now *exceed* the label key, so for those two the **key**, not the
 model, is the binding constraint. → exp-27 tests 20 epochs.
 
+**Finding — CAPACITY is the lever, and it is the largest effect since the labels.**
+exp-29 swapped resnet18 for convnext_tiny at the same 224 px, the same p2 geometry, the same 18
+windows, the same 12 epochs — only the encoder and its backbone LR changed.
+
+| | screening metric |
+|---|---|
+| b1, resnet18 | 0.7550 |
+| **exp-29, convnext_tiny** | **0.8105** |
+| paired delta | **+0.0556**, 2σ 0.0060, CI [+0.0502, +0.0616], P(Δ>0)=1.000 |
+
+**12 of 12 targets improved**, and the gains are largest exactly where our headroom was: Baker's
++0.107, Medial Meniscus +0.103, ACL +0.099, Lateral Meniscus +0.080. MCL is the exception at +0.014
+— it stays the hardest target by a distance.
+
+This is 12.6× the paired bar and 4.3× the error-gap closure the promotion gate asks for
+(22.7% of 1−AUC on the screening metric). It also reframes three earlier results:
+
+- **exp-22 was a recipe failure, not a capacity result.** DINOv2 at resnet18's LR scored −0.1128;
+  convnext at a backbone LR of 5e-05 scores +0.0556. The encoder was never the problem — feeding a
+  modern encoder a small CNN's learning rate was.
+- **exp-21 said the gap is a stronger single model.** It was right, and the cost of closing it is
+  one config line, not a new pipeline.
+- **Geometry and schedule were the wrong axes** — both saturated because the encoder was the
+  binding constraint the whole time.
+
+**Caveat carried forward: LR moved with the encoder**, so this is "convnext at a suitable LR" vs
+"resnet18 at its own", not a clean one-variable swap. Given a +0.0556 at a 0.0060 bar, the honest
+reading is that capacity dominates; the clean decomposition (resnet18 at 5e-05) is cheap and worth
+one screening run before promotion.
+
+**Cost, and the reason this is not yet a submission.** 191 s/epoch against resnet18's 69 s — **2.8×**.
+exp-31 measured b1's 3-model inference at 2.22 s/study, so a 3-seed convnext ensemble lands near
+6.2 s/study ≈ **8.6 h at 5,000 hidden studies**, past the 6.75 h working limit and close to the 9 h
+cap. A submittable build has to buy that back: one model instead of three, or `WINDOW_KEEP` at 12
+windows instead of 18 — both now measurable.
+
+**Finding — flip TTA does nothing, and rank averaging does not replicate.**
+exp-31, on b1's three stored checkpoints, 58 gold studies, paired, zero GPU:
+
+| variant | gold macro AUC |
+|---|---|
+| single checkpoint | 0.8007 |
+| prob-avg (b1) | **0.8317** |
+| prob-avg + flip TTA | 0.8311 |
+| rank-avg | 0.8301 |
+| rank-avg + flip TTA | 0.8302 |
+
+TTA − plain = **−0.0007**, CI [−0.0118, +0.0091], P(Δ>0)=0.442 — a null, at double the inference
+cost. Dropped. And **rank averaging, which measured +0.0021 on exp-11's seeds, measures −0.0016
+here**: the earlier "free gain" was noise at n=58 and should not have been carried as a finding.
+The ensemble itself is worth +0.031 over a single checkpoint, which remains real.
+
 **Finding — the gap is NOT ensembling. A single model of theirs beats our ensemble by 0.13.**
 exp-21 ran the public notebook's CoAtNet branch against our own 58 gold studies:
 
@@ -413,8 +465,8 @@ the pair says so at a glance. Everything before exp-17 is implicitly `t1`.
 | `exp-20260916-22-dinov2-small` | 2026-09-16 | architecture | Swap `resnet18` → **DINOv2 ViT-S/14** at p2/t2, its own normalisation read from the checkpoint | resnet18→ViT is a different jump from the DINOv2-S→B null a competitor measured | 0.7477 | **0.6349** | **−0.1128** (bar 0.0044), and 2.8× slower per epoch | — | **−1** | done |
 | `exp-20260916-21-profile-public` | 2026-09-16 | paper | Run the public ensemble's CoAtNet branch on our 58 gold studies | where does the 0.128 gap live? | our 0.7914 | **their single model 0.9205** | — | — | **+1** | done |
 | [`exp-20260917-28-res384`](plans/exp-28-res384.md) | 2026-09-17 | architecture | **p5**: 6 windows @384 (arm A) vs 6 windows @224 (arm B, `WINDOW_KEEP` on the p2 cache) vs b1's 18 @224 — a constant pixel budget, so the arms cost the same to run and to submit | the last untested line: their strongest single model runs at 384 and our headroom is in focal structures. 18 windows @384 is barred by the 9 h cap (15 h of inference), so detail must be bought with coverage | 0.7477 | — | — | — | — | **awaiting approval** |
-| `exp-20260917-29-convnext-tiny` | 2026-09-17 | architecture | **Capacity at fixed resolution**: resnet18 → convnext_tiny @224 on the p2 cache, 12 epochs, screened | exp-21 says the gap is a stronger single model; exp-22 tested a ViT at resnet18's LR and failed, which indicts the recipe, not capacity | 0.7550 | — | — | — | — | **running** |
-| `exp-20260917-31-flip-tta` | 2026-09-17 | packaging | Flip-TTA at inference, measured on b1's stored checkpoints — **CPU, no retraining, no GPU quota** | we train with horizontal flips and never use them at test | b1 gold 0.8319 | — | — | — | — | **running** |
+| `exp-20260917-29-convnext-tiny` | 2026-09-17 | architecture | **Capacity at fixed resolution**: resnet18 → convnext_tiny @224 on the p2 cache, 12 epochs, LR_BACKBONE 5e-05, screened | exp-21 says the gap is a stronger single model; exp-22 tested a ViT at resnet18's LR and failed, which indicts the recipe, not capacity | 0.7550 | **0.8105** | **+0.0556** paired, 2σ 0.0060, CI [+0.0502, +0.0616], P=1.000, **12/12 targets up** | — | **+1**, largest gain since the label swap | done, 2.04 GPU h |
+| `exp-20260917-31-flip-tta` | 2026-09-17 | packaging | Flip-TTA at inference, measured on b1's stored checkpoints — **CPU, no retraining, no GPU quota** | we train with horizontal flips and never use them at test | 0.8317 | 0.8311 | **−0.0007**, paired 2σ 0.0108, CI [−0.0118, +0.0091], P(Δ>0)=0.442 | — | **0 (null)** | done, 0 GPU |
 | `exp-20260916-19-split-train-infer` | 2026-09-16 | packaging | Publish weights as a dataset; submission notebook only infers | saves ~0.7 h of rerun, makes the submitted artefact exactly the measured one, and matters for the Efficiency Prize | — | — | — | — | — | **proposed** |
 | `exp-20260914-14-own-llm-v2` | 2026-09-16 | data-analysis | Reopen exp-12 with prompt v2 (a cost on "not addressed") **and** batched generation | the idea failed on execution, not premise | 0.8927 | — | — | — | — | **proposed** (1/3 fixes used) |
 
