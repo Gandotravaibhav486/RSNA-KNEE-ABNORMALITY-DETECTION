@@ -110,6 +110,18 @@ forum, share the final model publicly for open distribution and validation, and 
    headroom — measured on the visible test path extrapolated to the expected hidden test size
    **[verify: hidden test size is not published; extrapolate per-study seconds and state the
    assumed study count]**. A notebook that cannot state its per-study seconds is not reviewable.
+
+   **What the two numbers mean.** 9 h is Kaggle's hard cap: over it the rerun is killed and the
+   submission **errors — no score at all**, public or private, with no partial credit. 6.75 h is
+   *ours*, and nothing enforces it; a run between the two scores normally. The headroom covers what
+   we cannot control: the hidden test size is unpublished, Kaggle's hardware and queue vary run to
+   run, and a cold cache costs more than a warm one. Since a timeout consumes a final-selection slot
+   and returns nothing, treat 6.75 h as the planning limit and 6.75–9 h as a risk to be argued for
+   explicitly, per submission.
+
+   **[verify — before any submission that runs longer than 6.75 h]** whether selected submissions
+   are re-run against a different or larger private test set at the deadline. If they are, a
+   notebook that fits today can time out then, and the headroom is the only protection.
 8. **Offline by construction:** no network call anywhere in the notebook. All weights and packages
    come from attached Kaggle datasets/models. A notebook that only works with internet on is invalid.
 9. **Redistributable licences only** — see *Winners' obligations*. Record every external
