@@ -1,0 +1,4 @@
+2026-09-18 18:09:55 waiting for the GPU quota to reset; retrying every 15 min for up to 20 h
+2026-09-18 18:09:59 stage 0 refused (attempt 1): NOT STARTED: vaibhav486/rsna-knee-exp-30-r18-lr5e5
+2026-09-18 18:25:05 stage 0 refused (attempt 2): NOT STARTED: vaibhav486/rsna-knee-exp-30-r18-lr5e5
+2026-09-18 18:40:09 stage 0 refused (attempt 3): NOT STARTED: vaibhav486/rsna-knee-exp-30-r18-lr5e5

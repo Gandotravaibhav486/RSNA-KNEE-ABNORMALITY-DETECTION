@@ -1,0 +1,20 @@
+{
+  "experiment_id": "exp-29-convnext-tiny",
+  "overrides": {
+    "BACKBONE": "convnext_tiny",
+    "LR_BACKBONE": 5e-05
+  },
+  "screen_auc": 0.8105,
+  "refs": {
+    "b1 (p2, 18 windows, resnet18, 12 ep)": 0.755,
+    "same at 4 epochs (exp-17)": 0.7477
+  },
+  "backbone": "convnext_tiny",
+  "epochs": 12,
+  "K": 18,
+  "img": 224,
+  "preproc_version": "p2",
+  "gold_auc_sanity": 0.8703,
+  "n_screen": 3406,
+  "date": "2026-09-17"
+}

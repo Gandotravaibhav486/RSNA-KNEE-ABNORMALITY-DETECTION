@@ -110,11 +110,39 @@ forum, share the final model publicly for open distribution and validation, and 
    headroom — measured on the visible test path extrapolated to the expected hidden test size
    **[verify: hidden test size is not published; extrapolate per-study seconds and state the
    assumed study count]**. A notebook that cannot state its per-study seconds is not reviewable.
+
+   **What the two numbers mean.** 9 h is Kaggle's hard cap: over it the rerun is killed and the
+   submission **errors — no score at all**, public or private, with no partial credit. 6.75 h is
+   *ours*, and nothing enforces it; a run between the two scores normally. The headroom covers what
+   we cannot control: the hidden test size is unpublished, Kaggle's hardware and queue vary run to
+   run, and a cold cache costs more than a warm one. Since a timeout consumes a final-selection slot
+   and returns nothing, treat 6.75 h as the planning limit and 6.75–9 h as a risk to be argued for
+   explicitly, per submission.
+
+   **[verify — before any submission that runs longer than 6.75 h]** whether selected submissions
+   are re-run against a different or larger private test set at the deadline. If they are, a
+   notebook that fits today can time out then, and the headroom is the only protection.
 8. **Offline by construction:** no network call anywhere in the notebook. All weights and packages
    come from attached Kaggle datasets/models. A notebook that only works with internet on is invalid.
 9. **Redistributable licences only** — see *Winners' obligations*. Record every external
    dataset/model URL **and its licence** in the experiment entry.
 10. **Output file is `submission.csv`**, written unconditionally, including on the failure path.
+
+## Platform constraints (measured, not documented — rediscovering these costs runs)
+
+- **Weekly GPU quota: 30 h**, account-wide. Exhausting it refuses the push outright:
+  `Kernel push error: Maximum weekly GPU quota of 30.00 hours reached.` Hit on 2026-09-18.
+  The quota is a rolling weekly window; the reset time is shown only in the Kaggle UI
+  (Notebooks → the GPU meter). CPU sessions are **not** billed against it.
+- **2 concurrent batch GPU sessions**, also account-wide — other projects' kernels count.
+- `--accelerator NvidiaTeslaT4` is the only usable enum; anything else silently yields a P100
+  (sm_60) that this PyTorch cannot run on, and a CLI push overwrites the UI's accelerator choice.
+- Attachments mount nested: `/kaggle/input/{datasets,notebooks,competitions,models}/<owner>/<slug>/`.
+- Kernel logs appear only after the run completes.
+- **The leaderboard split is 30% public / 70% private of the same test data** (competition
+  Leaderboard tab, read 2026-09-18). The notebook runs **once** over the whole hidden test set and
+  both scores come from that one predictions file — so there is no second, larger rerun at the
+  deadline, and a submission that completes today carries no additional runtime risk later.
 
 ## Statistical rules (how we decide +1 / -1)
 

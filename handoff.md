@@ -3,104 +3,171 @@
 Updated before the end of every long session (AGENTS.md §10). Overwrite "Current state";
 append to "Log".
 
-## Current state — 2026-09-16
+## Current state — 2026-09-18
 
-**Best measured config: L1 labels + p2 geometry — gold CV 0.7794 (ensemble 0.7914).**
-Best *confirmed on the leaderboard*: L1 at **0.803**. The p2 submission is pending.
+**Baseline is still `b1` — gold 0.8319 / LB 0.824** — but it is about to be challenged. The
+programme's binding constraint turned out to be **the encoder**, and the replacement is measured but
+not yet promoted.
 
 | | value |
 |---|---|
-| **Lineage L1** (public LLM label key) | gold CV 0.7642 · screening 0.7419 · **LB 0.803** |
-| **+ p2 geometry** (accepted improvement, not a promotion) | gold CV **0.7794** (ens 0.7914) · screening **0.7501** · LB pending |
-| L0 (regex labels) | CV 0.6339 · LB 0.641 |
+| **b1** (p2 · t2 · 12 ep · 3 seeds · resnet18 @224) | gold **0.8319** · **LB 0.824** |
+| **exp-29 convnext_tiny**, same everything else | screening **0.8105** vs b1's 0.7550 = **+0.0556 paired**, CI [+0.0502, +0.0616], P=1.000, **12/12 targets up** |
 | Bars: gold marginal / gold paired / screening paired | 0.1110 / 0.0254 / **0.0044** |
-| Honest inference cost at p2 | **3.69 s/study** → 5.13 h at 5,000 hidden studies (cap 9 h, working limit 6.75 h) |
-| GPU used | ≈6.4 h of ~24 h/week |
-| Deadline | **2026-10-22** — 36 days |
+| GPU | **weekly quota (30 h, account-wide) exhausted 2026-09-18**; resets ~06:30 local on the 19th |
+| Deadline | **2026-10-22** — 34 days. Final submissions chosen: **0 of 2** |
 
-## In flight
+## In flight / armed
 
-- `exp-17-t2-independent-flips` — running. Screened at p2, paired against exp-16's OOF.
-- Submission **56261446** — p2 geometry, real predictions, pending. The fourth CV/LB point.
-- Submissions 56261421 / 56261500 — screening notebooks with no inference cell; these score 0.500
-  and carry no information.
+- **`scripts/await_quota.sh` is running in the background.** It retries exp-32 **stage 0**
+  (`{"LR_BACKBONE": 5e-05}`, screened — the LR control) and then **stage 1**
+  (`{"BACKBONE": "convnext_tiny", "LR_BACKBONE": 5e-05}`, the full gold run) every 15 minutes until
+  the quota resets. Both were approved by Vaibhav on 2026-09-18. Log: `results/await_quota.log`.
+  **If the machine slept through the reset, the loop died with it — check that log first and push
+  by hand.**
+- **Cache p5 is built** (4,407 studies, 6.87 GB, 0 errors, 0.58 h CPU) — exp-28 is unblocked but
+  still held.
+- **PR #1 is open** against `main` with everything through 2026-09-18, awaiting a title and body
+  (prepared text was handed over separately). `gh` is not installed on this machine, so the PR
+  cannot be edited from here.
+
+## The one finding that reorganises everything else
+
+**Capacity was the binding constraint, and every architecture result before exp-29 was measured at
+the wrong learning rate.** convnext_tiny at `LR_BACKBONE = 5e-05`, with b1's geometry, windows and
+schedule unchanged, gains **+0.0556** on the screening metric — 12.6× the paired bar and the largest
+effect since the label swap. Gains land where the headroom was: Baker's +0.107, Medial Meniscus
++0.103, ACL +0.099, Lateral Meniscus +0.080. **MCL is the exception at +0.014** and remains the
+hardest target in the competition for us.
+
+This reframes three earlier verdicts:
+
+- **exp-22 (DINOv2, −0.1128) was a recipe failure, not a capacity result.** Same class of swap,
+  resnet18's LR of 1e-04, opposite outcome. → hence stage 0, which decomposes encoder from LR.
+- **exp-21 was right**: the gap is a stronger single model, and it costs one config line.
+- **Geometry (exp-24/25/26) and schedule (exp-13/15/27) saturated** because the encoder was the
+  constraint the whole time. Those lines are closed, but they were closed *against a weak encoder* —
+  if convnext becomes b2, **the schedule and geometry questions are open again at the new capacity**
+  and must be re-screened rather than assumed.
+
+## What is NOT true, corrected on 2026-09-18
+
+- **Rank averaging is not a free gain.** +0.0021 on exp-11's seeds, **−0.0016** on b1's (exp-31).
+  It was n=58 noise and should never have been carried as a finding.
+- **Flip TTA does nothing**: −0.0007, CI [−0.0118, +0.0091], at double the inference cost. Dropped.
+- The seed ensemble itself **is** real: +0.031 over a single checkpoint.
+
+## Runtime, now that the leaderboard tab has been read
+
+**30% public / 70% private of the same test data.** The notebook runs **once** over the whole hidden
+test set and both scores come from that one predictions file — so there is **no larger private rerun
+at the deadline**, and a submission that completes today carries no extra runtime risk later.
+
+- **9 h is Kaggle's hard cap**: over it the rerun is killed and the submission **scores nothing** on
+  either board. No partial credit.
+- **6.75 h is ours** and unenforced. A run between the two scores normally. The headroom covers the
+  unpublished hidden test size, hardware variance, and cold-cache cost — and the fact that a timeout
+  consumes one of two final-selection slots and returns nothing.
+- **b1's completed rerun already bounds the hidden test size.** Reading its execution time off the
+  Submissions tab would turn the last `[verify]` into a number. Not yet done.
+
+## The blocker on promoting convnext
+
+**b1's submission notebook trains from scratch during the rerun.** That was affordable at 2.25 h.
+convnext is **2.8× per epoch** (191 s vs 69 s), so training (~6.3 h) plus inference exceeds 9 h.
+**exp-19, the train/infer split, stops being optional** — it is stage 2 of
+[plans/exp-32-b2-convnext.md](plans/exp-32-b2-convnext.md). Levers to buy the runtime back, in order,
+each measurable: 1 model instead of 3 (÷3, costs −0.031), `WINDOW_KEEP` at 12 of 18 windows (×0.67).
 
 ## Version axes — read this before comparing any two numbers
 
-- `PREPROC_VERSION` `p1` (3 slots × 4 windows @192, K=12) / `p2` (6 slots × 3 @224, K=18). Keys the
-  tensor cache.
-- `TRAIN_VERSION` `t1` / `t2` — new 2026-09-16. Keys the *training stream*. t2 fixes the flip RNG;
-  cached tensors are identical, so `p2/t2` is **not** comparable to `p2/t1`.
-- Lineage `L0` regex labels / `L1` public LLM key.
+- `PREPROC_VERSION` — `p1` (3×4 @192, K=12) · **`p2` (6×3 @224, K=18 — b1)** · `p3` (asymmetric,
+  K=22) · `p4` (uniform, K=22) · **`p5` (6×1 @384, K=6 — built, unused)**.
+- `TRAIN_VERSION` — `t1` / **`t2`** (independent flip RNG). Cached tensors are identical, so `p2/t2`
+  is **not** comparable to `p2/t1`.
+- `BASELINE_VERSION` — **`b1`**. `b2` requires the §13.1 gate: ≥20% error-gap closure. exp-29 clears
+  it on screening (22.7%); gold and a LB point are still owed.
+- `WINDOW_KEEP` — new, default `None`. Trains on a subset of a cache without rebuilding it.
+- Lineage `L0` regex / **`L1`** public LLM key.
 
-## What we know, in the order it should drive decisions
+## Queue, in priority order
 
-1. **Labels were the binding constraint.** Regex 0.6879 → LLM key 0.8927 on gold moved CV +0.1303
-   and LB +0.162. Nothing else changed. 35.6% CV / 45.1% LB error-gap closure → L1 promoted.
-2. **Measure paired, always.** On the same 58 gold studies the marginal bar is 0.1110 and the
-   **paired** bar is 0.0254 — 4.4× tighter, for zero GPU, just from keeping `gold_probs_*.npy`.
-   On the screening pool, paired gives **0.0044**.
-3. **Geometry is real but small.** 18 windows @224 vs 12 @192: +0.0154 on gold (unresolvable) and
-   **+0.0082 paired on the screening metric, CI [+0.0041, +0.0125], P=1.00** → +1. It costs 2.4× the
-   training GPU and ~1.5 h more inference headroom.
-4. **The model overfits noisy labels rather than underfitting.** Epochs 4→12 on L0: 0.6333 → 0.5998,
-   monotone down. On L1 the decline vanishes but no schedule wins — jagged, single seed, unresolved.
-5. **An LLM label prompt needs a cost on "not addressed".** Our own key (exp-12) answered "not
-   addressed" for 74.9% of cells (public key 25.4%) and scored 0.7125 — killed on two criteria.
-6. **CV predicts direction, not level.** CV/LB gaps: −0.009, +0.007, +0.039 and widening.
+1. **exp-32 stages 0 and 1** — armed, see above.
+2. **exp-32 stage 2 / exp-19** — the train/infer split. Blocked on stage 1's checkpoints.
+3. **Re-screen the closed lines at the new capacity** if convnext becomes b2 — schedule and geometry
+   were decided against resnet18.
+4. **exp-28 (384 px)** — written, cache built, held by Vaibhav.
+5. **exp-14, our own label key v2** — the only route to Effusion and Medial OA, where the *key*
+   now binds rather than the model. 1 of 3 fixes used. Also relevant to the winners' obligation,
+   since the L1 key's prompt is unpublished.
+6. **Final submission selection** — 0 of 2. b1 at 0.824 is the floor.
 
-## Queue
+## Tooling added 2026-09-18 — use these, do not rebuild them
 
-1. **Read exp-17.** If Δ < 0.0044, adopt t2 anyway — it is a correctness fix; just don't claim a gain.
-2. **exp-09 per-finding silence** — silence ⇒ negative for Baker's / Medial OA (gold-positive 0.03 /
-   0.00 when silent), unknown for Synovitis (0.34). Never blanket: the community measured blanket
-   imputation *losing* 0.0068.
-3. **Confidence-weighted loss** — the L1 key is soft; `2·|p−0.5|` sends "not addressed" cells to zero
-   weight automatically. Cheap, untested, inside L1.
-4. **exp-15 epochs on the screening metric** — 4 vs 12 at p2/t2, since gold could not resolve it.
-5. **Split training out of the submission notebook** — publish weights as a dataset so the rerun only
-   infers. Saves ~0.7 h of rerun time, makes the submitted artefact exactly the measured one, and
-   matters for the Efficiency Prize.
-6. **exp-14, our own label key, reopened** — only with prompt v2 (a cost on "not addressed") *and*
-   batched generation. Must beat 0.80 on gold-test in a pilot. 1 of 3 fix attempts used.
+- **`notebooks/screen.ipynb`** — the screening instrument, driven by the *same* `OVERRIDES` dict as
+  the baseline. `./scripts/exp.sh screen <id> '<json>'`. Ends the copy-a-notebook-per-experiment
+  pattern that caused most of this programme's failures.
+- **`scripts/pair_screen.py`** — reconstructs the screening pool's study order and pairs any two
+  stored OOF arrays offline. Every screening comparison is now paired and free.
+- **`exp.sh`**: `screen` / `qscreen`, `EXTRA_KERNELS` (attach another run's checkpoints), the L1
+  label key as a **default** dataset source, and the override injector now emits Python literals.
 
 ## Traps already paid for — do not rediscover these
 
-- **`kaggle kernels output` skips files that already exist locally.** A re-fetch after a new version
-  silently keeps the old artefacts; this produced a paired estimate 12× too large, caught only
-  because the number was implausible. `exp.sh fetch` now clears first.
-- **Submitting a screening notebook wastes a slot** — no inference cell means `submission.csv` is the
-  0.5 fallback. Check it is not constant before submitting. (Cost two slots so far.)
-- `--accelerator NvidiaTeslaT4` is the only usable GPU enum; anything else silently gives a P100
-  (sm_60) this PyTorch cannot run on, and a CLI push overwrites the UI's choice.
-- **2 concurrent batch GPU sessions.** CPU pushes are exempt; `exp.sh queue` waits for a slot.
-- Mounts are nested: `/kaggle/input/{datasets,notebooks,competitions,models}/<owner>/<slug>/…`.
-- Kernel logs appear only after a run completes.
-- `preflight()` and `scripts/lint_nb.py` exist because **every failure so far died after the
-  expensive part**, never before it.
-- Determinism holds *within* an accelerator (exp-08 and exp-13 both produced 0.7699 for seed 2026)
-  but not across devices (CPU 0.5637 vs T4 0.5728). `cudnn.deterministic` is **not** set.
+- **The override injector used to emit JSON**, so any boolean became `true` — a NameError. Fixed.
+  Every experiment before exp-31 passed only numbers and strings, which is why it never fired.
+- **The L1 label key must be attached** or every run dies at the lineage assertion. It is now a
+  default in `exp.sh`; it killed exp-29 and exp-31 once.
+- **Read the cache manifest, not `kaggle kernels files`** — that listing's size column is not bytes,
+  and it briefly looked like p5 had built 4,407 empty arrays. The manifest answers in one call.
+- **Never run `kaggle kernels output` on a cache kernel** — it pulls all 6.87 GB. Caches stay on
+  Kaggle as attachments.
+- **`kaggle kernels output` skips files that already exist locally**, silently keeping stale
+  artefacts. `exp.sh fetch` clears first. This once produced an estimate 12× too large.
+- **Submitting a screening notebook wastes a slot** — no inference cell means a constant-0.5
+  `submission.csv`. Never arm an automatic submit on file validity alone; gate on the score.
+- `--accelerator NvidiaTeslaT4` is the only usable GPU enum; a CLI push overwrites the UI's choice.
+- **2 concurrent GPU sessions and a 30 h weekly quota, both account-wide** — other projects count.
+- Mounts are nested; kernel logs appear only after a run completes.
+- Determinism holds within an accelerator, end to end through a full retrain (exp-11 submitted
+  twice, 0.808 both times), but not across devices.
 
 ## Assets on Kaggle
 
 | what | ref |
 |---|---|
-| L1 baseline | `vaibhav486/rsna-knee-exp-08-llm-labels` |
-| L1 + p2 geometry | `vaibhav486/rsna-knee-exp-11-geometry-p2` |
-| screening metric (p1 / p2) | `…exp-04-screening-metric` / `…exp-16-screen-p2` |
-| tensor caches | `…cache-build-p1` (4,410 studies, 4.84 GB) · `…cache-build-p2` (4,407 train-only, 8.0 GB) |
-| offline backbones | `vaibhav486/timm-backbones-offline` (Apache-2.0) |
+| **b1** | `vaibhav486/rsna-knee-exp-23-p2-t2-ep12` |
+| exp-29 (screening OOF, no checkpoints saved) | `vaibhav486/rsna-knee-exp-29-convnext-tiny` |
+| earlier LB points | `…exp-08-llm-labels` (0.803) · `…exp-11-geometry-p2` (0.808) |
+| screening references (p1 / p2 / 12-epoch) | `…exp-04-screening-metric` · `…exp-16-screen-p2` · `…exp-15-epochs-screened` |
+| tensor caches | `…cache-build-p2` (8.0 GB, b1) · `…cache-build-p3` · `…cache-build-p4` · **`…cache-build-p5` (6.87 GB, 384 px)** |
+| offline backbones | `vaibhav486/timm-backbones-offline` — resnet18/34, effnet-b0, **convnext_tiny** (Apache-2.0) |
 | public label key | `stevenleehans/rsna-knee-llm-report-labels` (CC0) |
 
 ## Open items
 
 - The L1 key's prompt and model are unpublished — we cannot reproduce or extend what the baseline
-  now depends on. Relevant to the winners' open-source obligation.
-- We hardcode ImageNet `mean`/`std`; read `preprocessor_config.json` before swapping encoders.
-- Still `[verify]`: Efficiency-Prize formula, hidden test size, daily submission cap.
-- `.claude/`, `.agents/`, `skills-lock.json` untracked.
+  depends on. Relevant to the winners' open-source obligation.
+- We hardcode ImageNet `mean`/`std`; read `preprocessor_config.json` before swapping encoders again.
+  convnext_tiny's in12k weights happen to use ImageNet statistics, so exp-29 is not affected.
+- Still `[verify]`: the Efficiency-Prize formula, the hidden test size, the daily submission cap.
+- `AGENTS.md` §8 sizes fix budgets against "~24 GPU h/week"; the real limit is **30 h**, shared
+  with Vaibhav's other projects. Worth reconciling.
 
 ## Log
+
+- **2026-09-18** — **exp-29 +1, the largest effect since the label swap**: convnext_tiny screens
+  +0.0556 paired (CI [+0.0502, +0.0616], 12/12 targets up) — capacity, not geometry or schedule, was
+  the binding constraint. exp-31 **null** (flip TTA −0.0007) and rank averaging **retracted** as n=58
+  noise. exp-25 read as a 4-epoch finding and closed. exp-32 planned in three stages and armed
+  against the quota reset. Cache p5 built on CPU. `screen.ipynb`, `pair_screen.py` and two `exp.sh`
+  bugs (JSON booleans, the missing label key) landed. Runtime semantics resolved: 30/70 split, one
+  rerun, no larger private rerun at the deadline.
+
+- **2026-09-17** — exp-27 **null** (20 epochs 0.8316 vs 12 epochs 0.8319; the schedule line closes).
+  exp-26 **−1** (p3's +0.0179 at 4 epochs became −0.0158 at 12 — screening must match training
+  length). AGENTS.md §14 adopted: one versioned baseline, experiments as config overrides.
+  `exp-28-res384` written and submitted for approval; cache builder p5 added.
 
 - **2026-09-16** — exp-16 **+1** (geometry confirmed, +0.0082 paired on the screening metric);
   exp-11 promoted to +1; p2 submitted (pending). exp-17 `t2-independent-flips` launched and the

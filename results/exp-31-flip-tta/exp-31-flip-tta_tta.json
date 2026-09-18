@@ -1,0 +1,15 @@
+{
+  "experiment_id": "exp-31-flip-tta",
+  "n_checkpoints": 3,
+  "variants": {
+    "single ckpt, plain": 0.8007,
+    "prob-avg, plain": 0.8317,
+    "prob-avg, + flip TTA": 0.8311,
+    "rank-avg, plain": 0.8301,
+    "rank-avg, + flip TTA": 0.8302
+  },
+  "tta_minus_plain": -0.0007,
+  "two_sigma": 0.0108,
+  "p_gain": 0.442,
+  "date": "2026-09-17"
+}
