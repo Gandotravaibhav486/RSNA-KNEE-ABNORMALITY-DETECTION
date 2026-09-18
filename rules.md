@@ -128,6 +128,22 @@ forum, share the final model publicly for open distribution and validation, and 
    dataset/model URL **and its licence** in the experiment entry.
 10. **Output file is `submission.csv`**, written unconditionally, including on the failure path.
 
+## Platform constraints (measured, not documented — rediscovering these costs runs)
+
+- **Weekly GPU quota: 30 h**, account-wide. Exhausting it refuses the push outright:
+  `Kernel push error: Maximum weekly GPU quota of 30.00 hours reached.` Hit on 2026-09-18.
+  The quota is a rolling weekly window; the reset time is shown only in the Kaggle UI
+  (Notebooks → the GPU meter). CPU sessions are **not** billed against it.
+- **2 concurrent batch GPU sessions**, also account-wide — other projects' kernels count.
+- `--accelerator NvidiaTeslaT4` is the only usable enum; anything else silently yields a P100
+  (sm_60) that this PyTorch cannot run on, and a CLI push overwrites the UI's accelerator choice.
+- Attachments mount nested: `/kaggle/input/{datasets,notebooks,competitions,models}/<owner>/<slug>/`.
+- Kernel logs appear only after the run completes.
+- **The leaderboard split is 30% public / 70% private of the same test data** (competition
+  Leaderboard tab, read 2026-09-18). The notebook runs **once** over the whole hidden test set and
+  both scores come from that one predictions file — so there is no second, larger rerun at the
+  deadline, and a submission that completes today carries no additional runtime risk later.
+
 ## Statistical rules (how we decide +1 / -1)
 
 - With **58 gold studies**, the standard error on a macro AUC is large. A CV delta is only called
